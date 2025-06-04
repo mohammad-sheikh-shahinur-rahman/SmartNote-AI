@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code } from 'lucide-react';
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
@@ -44,7 +44,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       setCurrentTags([]);
     }
     setTagInput('');
-    setGeneratedSummary(null); 
+    setGeneratedSummary(null);
   }, [noteToEdit, isOpen]);
 
   const handleSave = () => {
@@ -190,38 +190,103 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleInsertSummary = () => {
     if (generatedSummary) {
       setContent(prevContent => `${prevContent}\n\n## AI Summary\n${generatedSummary}`);
-      setGeneratedSummary(null); 
+      setGeneratedSummary(null);
       toast({ title: "Summary Inserted", description: "The AI summary has been added to your note content." });
     }
   };
 
-  const applyMarkdownFormatting = (prefix: string, suffix: string = prefix, defaultText: string = "text") => {
+  const applyMarkdownFormatting = (type: 'bold' | 'italic' | 'code' | 'strikethrough' | 'ul' | 'ol' | 'blockquote' | 'hr') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
     const selectedText = textarea.value.substring(start, end);
-    const textToWrap = selectedText || defaultText;
+    let newContentValue = '';
+    let newCursorPosStart = start;
+    let newCursorPosEnd = end;
+    const placeholderText = "text"; // Default placeholder
 
-    const newContent =
-      textarea.value.substring(0, start) +
-      prefix +
-      textToWrap +
-      suffix +
-      textarea.value.substring(end);
+    switch (type) {
+      case 'bold':
+        newContentValue = textarea.value.substring(0, start) + '**' + (selectedText || placeholderText) + '**' + textarea.value.substring(end);
+        newCursorPosStart = start + 2;
+        newCursorPosEnd = newCursorPosStart + (selectedText || placeholderText).length;
+        break;
+      case 'italic':
+        newContentValue = textarea.value.substring(0, start) + '*' + (selectedText || placeholderText) + '*' + textarea.value.substring(end);
+        newCursorPosStart = start + 1;
+        newCursorPosEnd = newCursorPosStart + (selectedText || placeholderText).length;
+        break;
+      case 'code':
+        newContentValue = textarea.value.substring(0, start) + '`' + (selectedText || 'code') + '`' + textarea.value.substring(end);
+        newCursorPosStart = start + 1;
+        newCursorPosEnd = newCursorPosStart + (selectedText || 'code').length;
+        break;
+      case 'strikethrough':
+        newContentValue = textarea.value.substring(0, start) + '~~' + (selectedText || placeholderText) + '~~' + textarea.value.substring(end);
+        newCursorPosStart = start + 2;
+        newCursorPosEnd = newCursorPosStart + (selectedText || placeholderText).length;
+        break;
+      case 'ul':
+        if (selectedText) {
+          const lines = selectedText.split('\n');
+          const formattedLines = lines.map(line => '- ' + line).join('\n');
+          newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
+          newCursorPosStart = start;
+          newCursorPosEnd = start + formattedLines.length;
+        } else {
+          newContentValue = textarea.value.substring(0, start) + '- List item' + textarea.value.substring(end);
+          newCursorPosStart = start + 2; // After '- '
+          newCursorPosEnd = newCursorPosStart + 'List item'.length;
+        }
+        break;
+      case 'ol':
+        if (selectedText) {
+          const lines = selectedText.split('\n');
+          const formattedLines = lines.map((line, index) => (index + 1) + '. ' + line).join('\n');
+          newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
+          newCursorPosStart = start;
+          newCursorPosEnd = start + formattedLines.length;
+        } else {
+          newContentValue = textarea.value.substring(0, start) + '1. List item' + textarea.value.substring(end);
+          newCursorPosStart = start + 3; // After '1. '
+          newCursorPosEnd = newCursorPosStart + 'List item'.length;
+        }
+        break;
+      case 'blockquote':
+        if (selectedText) {
+          const lines = selectedText.split('\n');
+          const formattedLines = lines.map(line => '> ' + line).join('\n');
+          newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
+          newCursorPosStart = start;
+          newCursorPosEnd = start + formattedLines.length;
+        } else {
+          newContentValue = textarea.value.substring(0, start) + '> Blockquote' + textarea.value.substring(end);
+          newCursorPosStart = start + 2; // After '> '
+          newCursorPosEnd = newCursorPosStart + 'Blockquote'.length;
+        }
+        break;
+      case 'hr':
+        const prevChar = textarea.value.substring(start - 1, start);
+        const needsNewLinePrefix = start > 0 && prevChar !== '\n';
+        const hrText = (needsNewLinePrefix ? '\n' : '') + '---\n';
+        newContentValue = textarea.value.substring(0, start) + hrText + textarea.value.substring(end);
+        newCursorPosStart = start + hrText.length;
+        newCursorPosEnd = newCursorPosStart;
+        break;
+    }
 
-    setContent(newContent);
+    setContent(newContentValue);
 
     setTimeout(() => {
       if (textarea) {
         textarea.focus();
-        const newCursorPosStart = start + prefix.length;
-        const newCursorPosEnd = newCursorPosStart + textToWrap.length;
         textarea.setSelectionRange(newCursorPosStart, newCursorPosEnd);
       }
     }, 0);
   };
+
 
   if (!isOpen) return null;
 
@@ -262,15 +327,30 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             <Label htmlFor="content" className="text-left font-semibold">
               Content
             </Label>
-            <div className="flex items-center gap-1 mb-2 p-1 border rounded-md bg-muted/50">
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('**')} title="Bold">
+            <div className="flex items-center gap-1 mb-2 p-1 border rounded-md bg-muted/50 flex-wrap">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('bold')} title="Bold">
                 <Bold className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('*')} title="Italic">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('italic')} title="Italic">
                 <Italic className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('`')} title="Inline Code">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('code')} title="Inline Code">
                 <Code className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('strikethrough')} title="Strikethrough">
+                <Strikethrough className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ul')} title="Unordered List">
+                <List className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ol')} title="Ordered List">
+                <ListOrdered className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('blockquote')} title="Blockquote">
+                <Quote className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('hr')} title="Horizontal Rule">
+                <Minus className="h-4 w-4" />
               </Button>
             </div>
             <Textarea
@@ -306,7 +386,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               <div className="text-sm whitespace-pre-wrap p-2 bg-background rounded">{generatedSummary}</div>
             </div>
           )}
-          
+
           <Separator />
 
           <div className="grid gap-2">
