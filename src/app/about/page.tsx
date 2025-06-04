@@ -21,10 +21,11 @@ const AboutPage = () => {
   const { language } = useLanguage();
   const t = getTranslations(language);
 
+  // Developer specific information (remains hardcoded as per current structure, can be moved to translations if full multilingual support for this section is needed)
   const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান"; 
   const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক"; 
   const imageUrl = "https://m.media-amazon.com/images/S/amzn-author-media-prod/b02mvc2hucu96hchlksdjmogii._SY450_CR0%2C0%2C450%2C450_.jpg";
-  const shortIntro = "মোহাম্মদ শেখ শাহিনুর রহমান একজন বহুমাত্রিক প্রতিভার অধিকারী ব্যক্তিত্ব। তিনি একাধারে একজন সফটওয়্যার ইঞ্জিনিয়ার, প্রোগ্রামার, ডিজিটাল ফরেনসিক বিশেষজ্ঞ এবং প্রযুক্তি উদ্ভাবক। প্রযুক্তির জগতের বাইরেও তিনি একজন স্বনামধন্য কবি ও লেখক। তার লেখনী এবং প্রযুক্তিগত উদ্ভাবন উভয় ক্ষেত্রেই তিনি সমাজের জন্য গুরুত্বপূর্ণ অবদান রেখে চলেছেন।";
+  const developerShortIntro = "মোহাম্মদ শেখ শাহিনুর রহমান একজন বহুমাত্রিক প্রতিভার অধিকারী ব্যক্তিত্ব। তিনি একাধারে একজন সফটওয়্যার ইঞ্জিনিয়ার, প্রোগ্রামার, ডিজিটাল ফরেনসিক বিশেষজ্ঞ এবং প্রযুক্তি উদ্ভাবক। প্রযুক্তির জগতের বাইরেও তিনি একজন স্বনামধন্য কবি ও লেখক। তার লেখনী এবং প্রযুক্তিগত উদ্ভাবন উভয় ক্ষেত্রেই তিনি সমাজের জন্য গুরুত্বপূর্ণ অবদান রেখে চলেছেন।";
   const professionalIdentities = [
     "সফটওয়্যার ইঞ্জিনিয়ার",
     "প্রোগ্রামার",
@@ -66,14 +67,25 @@ const AboutPage = () => {
           <Separator />
           <CardContent className="pt-6 px-6 md:px-8">
             <section className="mb-8">
+              <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">{t.aboutAppTitle}</h2>
+              <p className="text-foreground leading-relaxed text-justify">{t.aboutAppDescription}</p>
+            </section>
+
+            <section className="mb-8">
               <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">{t.shortIntroTitle}</h2>
-              <p className="text-foreground leading-relaxed text-justify">{shortIntro}</p>
+              <p className="text-foreground leading-relaxed text-justify">{language === 'bn' ? developerShortIntro : "Mohammad Sheikh Shahinur Rahman is a multifaceted personality. He is a software engineer, programmer, digital forensics expert, and technology innovator. Beyond the world of technology, he is also a renowned poet and writer. He continues to make significant contributions to society through both his writings and technological innovations."}</p>
             </section>
             
             <section className="mb-8">
               <h2 className="text-2xl font-semibold font-headline mb-4 text-accent border-b-2 border-accent/30 pb-2">{t.professionalIdentitiesTitle}</h2>
               <ul className="space-y-2 text-foreground">
-                {professionalIdentities.map((identity, index) => (
+                {(language === 'bn' ? professionalIdentities : [
+                  "Software Engineer",
+                  "Programmer",
+                  "Poet & Writer",
+                  "Digital Forensics Expert",
+                  "Technology Innovator"
+                ]).map((identity, index) => (
                   <li key={index} className="flex items-center">
                     <Check className="mr-3 h-5 w-5 text-primary flex-shrink-0" />
                     {identity}
