@@ -149,6 +149,13 @@ export const translations = {
     themeNostalgic: "Nostalgic",
     modeLight: "Light",
     modeDark: "Dark",
+
+    // AI Chat Advisor on Home Page
+    chatWithAdvisorTitle: "Chat with AI Advisor",
+    chatInputPlaceholder: "Ask your AI Advisor, Boss...",
+    sendButtonLabel: "Send message",
+    aiWelcomeMessage: "Hello Boss! I am your AI Advisor, created by Mohammad Sheikh Shahinur Rahman. How can I assist you today?",
+    chatError: "Sorry Boss, I'm having trouble connecting right now. Please try again later.",
   },
   bn: {
     appTitle: 'স্মার্টনোট এআই',
@@ -296,6 +303,13 @@ export const translations = {
     themeNostalgic: "নস্টালজিক",
     modeLight: "লাইট",
     modeDark: "ডার্ক",
+
+    // AI Chat Advisor on Home Page
+    chatWithAdvisorTitle: "এআই উপদেষ্টার সাথে চ্যাট করুন",
+    chatInputPlaceholder: "আপনার এআই উপদেষ্টাকে জিজ্ঞাসা করুন, বস...",
+    sendButtonLabel: "বার্তা পাঠান",
+    aiWelcomeMessage: "হ্যালো বস! আমি আপনার এআই উপদেষ্টা, আমাকে তৈরি করেছেন মোহাম্মদ শেখ শাহিনুর রহমান। আজ আমি আপনাকে কীভাবে সহায়তা করতে পারি?",
+    chatError: "দুঃখিত বস, এই মুহূর্তে সংযোগ করতে সমস্যা হচ্ছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।",
   },
 };
 

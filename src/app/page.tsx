@@ -1,20 +1,23 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import type { Note } from '@/lib/types';
 import AppHeader from '@/components/AppHeader';
 import NoteCard from '@/components/NoteCard';
 import NoteEditor from '@/components/NoteEditor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { FilePlus, Search, ArchiveIcon, ArchiveXIcon, GripVertical, List } from 'lucide-react';
+import { FilePlus, Search, ArchiveIcon, ArchiveXIcon, GripVertical, List, User, SendHorizonal, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
 import Link from 'next/link';
+import { chatWithAdvisorAction } from '@/lib/actions';
 
 
 const initialNotes: Note[] = [
@@ -73,6 +76,13 @@ export default function HomePage() {
   const { language } = useLanguage();
   const t = getTranslations(language);
 
+  // Chat state
+  const [chatMessages, setChatMessages] = useState<{ sender: 'user' | 'ai'; text: string }[]>([]);
+  const [userInput, setUserInput] = useState('');
+  const [isLoadingChat, setIsLoadingChat] = useState(false);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isChatAccordionOpen, setIsChatAccordionOpen] = useState(false);
+
   useEffect(() => {
     const storedNotes = localStorage.getItem('smartnote-ai-notes');
     if (storedNotes) {
@@ -87,6 +97,19 @@ export default function HomePage() {
         localStorage.setItem('smartnote-ai-notes', JSON.stringify(notes));
     }
   }, [notes]);
+
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+  
+  useEffect(() => {
+    // Add initial AI welcome message if chat is open and messages are empty
+    if (isChatAccordionOpen && chatMessages.length === 0 && !isLoadingChat) {
+        setChatMessages([{ sender: 'ai', text: t.aiWelcomeMessage }]);
+    }
+  }, [isChatAccordionOpen, t.aiWelcomeMessage, isLoadingChat]); // Removed chatMessages from dependency to avoid re-triggering
 
 
   const handleSaveNote = (note: Note) => {
@@ -104,7 +127,7 @@ export default function HomePage() {
       title: isUpdating ? t.noteUpdated : t.noteCreated, 
       description: t.noteSavedMessage.replace('{title}', note.title || t.untitledNote) 
     });
-    setEditingNote(null); // Clear editingNote after save
+    setEditingNote(null); 
   };
 
   const handleEditNote = (note: Note) => {
@@ -147,6 +170,25 @@ export default function HomePage() {
     setIsEditorOpen(true);
   };
 
+  const handleSendMessage = async () => {
+    if (!userInput.trim()) return;
+    const newUserMessage = { sender: 'user' as const, text: userInput.trim() };
+    setChatMessages(prev => [...prev, newUserMessage]);
+    const currentMessageText = userInput.trim();
+    setUserInput('');
+    setIsLoadingChat(true);
+
+    try {
+      const aiResponseText = await chatWithAdvisorAction({ userMessage: currentMessageText });
+      setChatMessages(prev => [...prev, { sender: 'ai' as const, text: aiResponseText }]);
+    } catch (error) {
+      console.error("Chat error:", error);
+      setChatMessages(prev => [...prev, { sender: 'ai' as const, text: t.chatError }]);
+    } finally {
+      setIsLoadingChat(false);
+    }
+  };
+
   const filteredNotes = useMemo(() => {
     return notes.filter(note => {
       const searchLower = searchTerm.toLowerCase();
@@ -168,6 +210,80 @@ export default function HomePage() {
     <div className="min-h-screen flex flex-col">
       <AppHeader />
       <main className="flex-grow container mx-auto px-4 py-8">
+        <div className="mb-6">
+         <Accordion 
+            type="single" 
+            collapsible 
+            className="w-full mb-6 shadow-md rounded-lg bg-card"
+            onValueChange={(value) => setIsChatAccordionOpen(value === "ai-chat")}
+          >
+            <AccordionItem value="ai-chat">
+              <AccordionTrigger className="px-6 py-4 text-lg font-semibold text-primary hover:no-underline data-[state=open]:border-b">
+                {t.chatWithAdvisorTitle}
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pt-0 pb-4">
+                <div className="flex flex-col h-[400px] border rounded-md">
+                  <div ref={chatContainerRef} className="flex-grow p-4 space-y-4 overflow-y-auto bg-muted/50">
+                    {chatMessages.map((msg, index) => (
+                      <div key={index} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        {msg.sender === 'ai' && (
+                          <Avatar className="h-8 w-8 self-start">
+                            <AvatarImage src="https://placehold.co/40x40.png" alt="AI" data-ai-hint="robot avatar"/>
+                            <AvatarFallback>AI</AvatarFallback>
+                          </Avatar>
+                        )}
+                        <div
+                          className={`max-w-[70%] rounded-lg px-3 py-2 shadow-sm ${
+                            msg.sender === 'user'
+                              ? 'bg-primary text-primary-foreground rounded-br-none'
+                              : 'bg-background text-foreground border border-border rounded-bl-none'
+                          }`}
+                        >
+                          {msg.text.split('\n').map((line, i, arr) => (
+                            <span key={i}>{line}{i < arr.length - 1 && <br/>}</span>
+                          ))}
+                        </div>
+                        {msg.sender === 'user' && (
+                           <Avatar className="h-8 w-8 self-start">
+                             <AvatarFallback><User className="h-5 w-5"/></AvatarFallback>
+                           </Avatar>
+                        )}
+                      </div>
+                    ))}
+                    {isLoadingChat && (
+                      <div className="flex items-end gap-2 justify-start">
+                         <Avatar className="h-8 w-8 self-start">
+                            <AvatarImage src="https://placehold.co/40x40.png" alt="AI" data-ai-hint="robot avatar"/>
+                            <AvatarFallback>AI</AvatarFallback>
+                          </Avatar>
+                        <div className="max-w-[70%] rounded-lg px-3 py-2 shadow-sm bg-background text-foreground border border-border rounded-bl-none">
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 border-t bg-card">
+                    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex items-center gap-2">
+                      <Input
+                        type="text"
+                        value={userInput}
+                        onChange={(e) => setUserInput(e.target.value)}
+                        placeholder={t.chatInputPlaceholder}
+                        className="flex-grow"
+                        disabled={isLoadingChat}
+                        aria-label={t.chatInputPlaceholder}
+                      />
+                      <Button type="submit" disabled={isLoadingChat || !userInput.trim()} className="bg-primary hover:bg-primary/90 text-primary-foreground" aria-label={t.sendButtonLabel}>
+                        {isLoadingChat ? <Loader2 className="h-5 w-5 animate-spin" /> : <SendHorizonal className="h-5 w-5" />}
+                      </Button>
+                    </form>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
+
         <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
           <div className="relative w-full sm:max-w-xs">
             <Input
@@ -283,5 +399,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

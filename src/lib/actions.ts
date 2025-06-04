@@ -13,6 +13,8 @@ import { translateNote } from '@/ai/flows/translate-note';
 import type { TranslateNoteInput } from '@/ai/flows/translate-note';
 import { getAIAdvice } from '@/ai/flows/ai-advisor-flow';
 import type { GetAIAdviceInput } from '@/ai/flows/ai-advisor-flow';
+import { chatWithAdvisor } from '@/ai/flows/chat-advisor-flow';
+import type { ChatWithAdvisorInput } from '@/ai/flows/chat-advisor-flow';
 
 
 export async function suggestTitleAction(
@@ -45,7 +47,8 @@ export async function summarizeNoteAction(
   try {
     const result = await summarizeNote(input);
     return result.summary;
-  } catch (error) {
+  } catch (error)
+ {
     console.error('Error summarizing note:', error);
     throw new Error('Failed to summarize note. Please try again.');
   }
@@ -84,5 +87,21 @@ export async function getAIAdviceAction(
   } catch (error) {
     console.error('Error getting AI advice:', error);
     throw new Error('Failed to get AI advice. Please try again.');
+  }
+}
+
+export async function chatWithAdvisorAction(
+  input: ChatWithAdvisorInput
+): Promise<string> {
+  try {
+    const result = await chatWithAdvisor(input);
+    return result.aiResponse;
+  } catch (error) {
+    console.error('Error chatting with advisor:', error);
+    // Provide a user-friendly error message
+    if (error instanceof Error && error.message.includes("did not return a response")) {
+        return "I'm sorry, Boss, I couldn't process that. Could you try rephrasing?";
+    }
+    return 'Sorry Boss, I encountered an issue trying to respond. Please try again in a moment.';
   }
 }
