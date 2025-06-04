@@ -11,6 +11,9 @@ import { voiceToText } from '@/ai/flows/voice-to-text';
 import type { VoiceToTextInput } from '@/ai/flows/voice-to-text';
 import { translateNote } from '@/ai/flows/translate-note';
 import type { TranslateNoteInput } from '@/ai/flows/translate-note';
+import { getAIAdvice } from '@/ai/flows/ai-advisor-flow';
+import type { GetAIAdviceInput } from '@/ai/flows/ai-advisor-flow';
+
 
 export async function suggestTitleAction(
   input: SuggestNoteTitleInput
@@ -69,5 +72,17 @@ export async function translateNoteAction(
   } catch (error) {
     console.error('Error translating note:', error);
     throw new Error('Failed to translate note. Please try again.');
+  }
+}
+
+export async function getAIAdviceAction(
+  input: GetAIAdviceInput
+): Promise<string> {
+  try {
+    const result = await getAIAdvice(input);
+    return result.advice;
+  } catch (error) {
+    console.error('Error getting AI advice:', error);
+    throw new Error('Failed to get AI advice. Please try again.');
   }
 }

@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect, KeyboardEvent, useRef } from 'react';
 import type { Note } from '@/lib/types';
-import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction, voiceToTextAction, translateNoteAction } from '@/lib/actions';
+import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction, voiceToTextAction, translateNoteAction, getAIAdviceAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle, Languages } from 'lucide-react';
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle, Languages, Brain } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,8 +31,13 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const [tagInput, setTagInput] = useState('');
   const [isSuggestingTitle, setIsSuggestingTitle] = useState(false);
   const [isSuggestingTags, setIsSuggestingTags] = useState(false);
+  
   const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
+
+  const [generatedAdvice, setGeneratedAdvice] = useState<string | null>(null);
+  const [isAdvising, setIsAdvising] = useState(false);
+
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { language } = useLanguage();
@@ -75,6 +80,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     }
     setTagInput('');
     setGeneratedSummary(null);
+    setGeneratedAdvice(null);
     setIsRecording(false);
     setIsTranscribing(false);
     setPermissionError(null);
@@ -232,6 +238,45 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     }
   };
 
+  const handleGetAIAdvice = async () => {
+    if (!content) {
+      toast({
+        title: t.getAdviceErrorTitle,
+        description: t.getAdviceErrorDesc,
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsAdvising(true);
+    setGeneratedAdvice(null);
+    try {
+      const advice = await getAIAdviceAction({ noteContent: content });
+      setGeneratedAdvice(advice);
+      toast({
+        title: t.adviceGeneratedToastTitle,
+        description: t.adviceGeneratedToastDesc,
+      });
+    } catch (error) {
+      console.error('Failed to get AI advice:', error);
+      toast({
+        title: t.getAdviceFailToastTitle,
+        description: t.getAdviceFailToastDesc,
+        variant: "destructive",
+      });
+    } finally {
+      setIsAdvising(false);
+    }
+  };
+
+  const handleInsertAdvice = () => {
+    if (generatedAdvice) {
+      setContent(prevContent => `${prevContent}\n\n## ${t.aiAdviceLabel}\n${generatedAdvice}`);
+      setGeneratedAdvice(null);
+      toast({ title: t.adviceInsertedToastTitle, description: t.adviceInsertedToastDesc });
+    }
+  };
+
+
   const applyMarkdownFormatting = (type: 'bold' | 'italic' | 'code' | 'strikethrough' | 'ul' | 'ol' | 'blockquote' | 'hr') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -338,7 +383,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         };
 
         mediaRecorderRef.current.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' }); // Explicitly setting MIME type
           const reader = new FileReader();
           reader.readAsDataURL(audioBlob);
           reader.onloadend = async () => {
@@ -494,7 +539,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 mt-[-10px] mb-2">
+          <div className="flex flex-wrap items-stretch gap-2 mt-[-10px] mb-2">
               <Button
                 onClick={handleSummarizeNote}
                 variant="outline"
@@ -505,9 +550,19 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
                 {t.summarizeButton}
               </Button>
-              <div className="flex flex-wrap items-center gap-2 flex-grow sm:flex-grow-0">
+              <Button
+                onClick={handleGetAIAdvice}
+                variant="outline"
+                size="sm"
+                disabled={isAdvising || !content}
+                className="flex-grow sm:flex-grow-0"
+              >
+                {isAdvising ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Brain className="mr-2 h-4 w-4" />}
+                {t.aiAdvisorButton}
+              </Button>
+              <div className="flex flex-wrap items-center gap-2 flex-grow sm:flex-grow-0 min-w-[150px]">
                 <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-                  <SelectTrigger className="w-full min-w-[150px] sm:w-[180px] h-9 text-sm">
+                  <SelectTrigger className="w-full sm:w-[180px] h-9 text-sm flex-1">
                     <SelectValue placeholder={t.selectLanguagePlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
@@ -523,13 +578,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                   variant="outline"
                   size="sm"
                   disabled={isTranslating || !content}
+                  className="flex-1"
                 >
                   {isTranslating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Languages className="mr-2 h-4 w-4" />}
                   {t.translateButton}
                 </Button>
               </div>
           </div>
-
+          
           {generatedSummary && (
             <div className="grid gap-2 p-4 border rounded-md bg-muted/50">
               <div className="flex justify-between items-center">
@@ -541,6 +597,19 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               <div className="text-sm whitespace-pre-wrap p-2 bg-background rounded">{generatedSummary}</div>
             </div>
           )}
+
+          {generatedAdvice && (
+            <div className="grid gap-2 p-4 border rounded-md bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-left font-semibold text-primary">{t.aiAdviceLabel}</Label>
+                <Button onClick={handleInsertAdvice} variant="outline" size="sm">
+                  <FileText className="mr-2 h-4 w-4" /> {t.insertAdviceButton}
+                </Button>
+              </div>
+              <div className="text-sm whitespace-pre-wrap p-2 bg-background rounded">{generatedAdvice}</div>
+            </div>
+          )}
+
 
           <Separator />
 
@@ -604,5 +673,3 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 };
 
 export default NoteEditor;
-
-    
