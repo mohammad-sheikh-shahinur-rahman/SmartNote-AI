@@ -21,6 +21,7 @@ export const translations = {
     noArchivedNotes: "No archived notes found.",
     noArchivedNotesDesc: "Try adjusting your search or archiving some notes.",
     footerText: "SmartNote AI",
+    aboutDeveloper: "About the Developer",
   },
   bn: {
     appTitle: 'স্মার্টনোট এআই',
@@ -41,6 +42,7 @@ export const translations = {
     noArchivedNotes: "কোনো আর্কাইভ করা নোট পাওয়া যায়নি।",
     noArchivedNotesDesc: "আপনার অনুসন্ধান সামঞ্জস্য করুন বা কিছু নোট আর্কাইভ করুন।",
     footerText: "স্মার্টনোট এআই",
+    aboutDeveloper: "ডেভেলপার পরিচিতি",
   },
 };
 

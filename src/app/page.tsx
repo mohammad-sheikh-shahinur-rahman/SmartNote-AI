@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
+import Link from 'next/link';
 
 
 const initialNotes: Note[] = [
@@ -267,6 +268,10 @@ export default function HomePage() {
       </main>
       <footer className="text-center py-4 border-t text-sm text-muted-foreground">
         {t.footerText} &copy; {new Date().getFullYear()}
+        <span className="mx-2">|</span>
+        <Link href="/about" className="hover:underline text-primary">
+          {t.aboutDeveloper}
+        </Link>
       </footer>
     </div>
   );
