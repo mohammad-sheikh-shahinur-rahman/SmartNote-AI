@@ -12,6 +12,8 @@ import { FilePlus, Search, ArchiveIcon, ArchiveXIcon, GripVertical, List } from 
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslations } from '@/lib/translations';
 
 
 const initialNotes: Note[] = [
@@ -67,6 +69,8 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = getTranslations(language);
 
   useEffect(() => {
     const storedNotes = localStorage.getItem('smartnote-ai-notes');
@@ -160,7 +164,7 @@ export default function HomePage() {
           <div className="relative w-full sm:max-w-xs">
             <Input
               type="search"
-              placeholder="Search notes or tags..."
+              placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -169,39 +173,39 @@ export default function HomePage() {
           </div>
           <div className="flex gap-2 items-center">
              <ToggleGroup type="single" defaultValue="grid" value={viewMode} onValueChange={(value) => { if (value) setViewMode(value as 'grid' | 'list')}}>
-              <ToggleGroupItem value="grid" aria-label="Grid view">
+              <ToggleGroupItem value="grid" aria-label={t.viewGridView}>
                 <GripVertical className="h-5 w-5" />
               </ToggleGroupItem>
-              <ToggleGroupItem value="list" aria-label="List view">
+              <ToggleGroupItem value="list" aria-label={t.viewListView}>
                 <List className="h-5 w-5" />
               </ToggleGroupItem>
             </ToggleGroup>
             <Button onClick={() => setShowArchived(!showArchived)} variant="outline">
               {showArchived ? <ArchiveXIcon className="mr-2 h-5 w-5" /> : <ArchiveIcon className="mr-2 h-5 w-5" />}
-              {showArchived ? 'View Active' : 'View Archived'}
+              {showArchived ? t.viewActive : t.viewArchived}
             </Button>
             <Button onClick={openNewNoteEditor} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-              <FilePlus className="mr-2 h-5 w-5" /> New Note
+              <FilePlus className="mr-2 h-5 w-5" /> {t.newNote}
             </Button>
           </div>
         </div>
 
         {notesToDisplay.length === 0 && !showArchived && (
             <div className="text-center py-10">
-                <p className="text-xl text-muted-foreground">No active notes found.</p>
-                <p className="text-muted-foreground">Try creating a new note or adjusting your search.</p>
+                <p className="text-xl text-muted-foreground">{t.noActiveNotes}</p>
+                <p className="text-muted-foreground">{t.noActiveNotesDesc}</p>
             </div>
         )}
         {notesToDisplay.length === 0 && showArchived && (
             <div className="text-center py-10">
-                <p className="text-xl text-muted-foreground">No archived notes found.</p>
-                <p className="text-muted-foreground">Try adjusting your search or archiving some notes.</p>
+                <p className="text-xl text-muted-foreground">{t.noArchivedNotes}</p>
+                <p className="text-muted-foreground">{t.noArchivedNotesDesc}</p>
             </div>
         )}
 
         {!showArchived && pinnedNotes.length > 0 && (
           <>
-            <h2 className="text-2xl font-semibold font-headline mb-4 text-primary">Pinned Notes</h2>
+            <h2 className="text-2xl font-semibold font-headline mb-4 text-primary">{t.pinnedNotes}</h2>
             <div className={`mb-8 grid gap-6 ${viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
               {pinnedNotes.map(note => (
                 <NoteCard
@@ -220,7 +224,7 @@ export default function HomePage() {
 
         {!showArchived && activeNotes.length > 0 && (
           <>
-            <h2 className="text-2xl font-semibold font-headline mb-4">{pinnedNotes.length > 0 ? 'Other Notes' : 'Your Notes'}</h2>
+            <h2 className="text-2xl font-semibold font-headline mb-4">{pinnedNotes.length > 0 ? t.otherNotes : t.yourNotes}</h2>
             <div className={`grid gap-6 ${viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
               {activeNotes.map(note => (
                 <NoteCard
@@ -238,7 +242,7 @@ export default function HomePage() {
 
         {showArchived && archivedNotes.length > 0 && (
           <>
-            <h2 className="text-2xl font-semibold font-headline mb-4 text-muted-foreground">Archived Notes</h2>
+            <h2 className="text-2xl font-semibold font-headline mb-4 text-muted-foreground">{t.archivedNotes}</h2>
             <div className={`grid gap-6 ${viewMode === 'grid' ? 'sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
               {archivedNotes.map(note => (
                 <NoteCard
@@ -262,7 +266,7 @@ export default function HomePage() {
         />
       </main>
       <footer className="text-center py-4 border-t text-sm text-muted-foreground">
-        SmartNote AI &copy; {new Date().getFullYear()}
+        {t.footerText} &copy; {new Date().getFullYear()}
       </footer>
     </div>
   );
