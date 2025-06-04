@@ -494,19 +494,20 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             />
           </div>
 
-          <div className="flex items-center gap-2 mt-[-10px] mb-2 flex-wrap">
+          <div className="flex flex-wrap items-center gap-2 mt-[-10px] mb-2">
               <Button
                 onClick={handleSummarizeNote}
                 variant="outline"
                 size="sm"
                 disabled={isSummarizing || !content}
+                className="flex-grow sm:flex-grow-0"
               >
                 {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
                 {t.summarizeButton}
               </Button>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 flex-grow sm:flex-grow-0">
                 <Select value={targetLanguage} onValueChange={setTargetLanguage}>
-                  <SelectTrigger className="w-[180px] h-9 text-sm">
+                  <SelectTrigger className="w-full min-w-[150px] sm:w-[180px] h-9 text-sm">
                     <SelectValue placeholder={t.selectLanguagePlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
