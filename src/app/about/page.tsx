@@ -10,27 +10,11 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
-import React from 'react'; // Import React for dynamic metadata
+import React, { useEffect } from 'react'; // Import useEffect
 
-// export const metadata: Metadata = { // This needs to be dynamic or handled differently for i18n
-//   title: 'ডেভেলপার পরিচিতি - SmartNote AI',
-//   description: 'স্মার্টনোট এআই এর ডেভেলপার মোহাম্মদ শেখ শাহিনুর রহমান সম্পর্কে তথ্য।',
-// };
-
-// Dynamic metadata generation
-export function generateMetadata(): Metadata {
-  // In a real scenario, you might get the language from context or params
-  // For simplicity here, we'll default to 'bn' for metadata or 'en' if needed.
-  // This is tricky for server components as language context is client-side.
-  // A common approach is to set metadata in the component if it's a client component,
-  // or pass lang via params if it's a server-rendered page for true i18n in metadata.
-  const t = getTranslations('bn'); // Defaulting to Bangla for metadata for now
-  return {
-    title: t.aboutPageTitleMeta,
-    description: t.aboutPageDescriptionMeta,
-  };
-}
-
+// Client components cannot export 'generateMetadata'.
+// Metadata for this page will be set via client-side useEffect for the document title,
+// or could fall back to what's defined in a parent layout for static meta tags.
 
 const AboutPage = () => {
   const { language } = useLanguage();
@@ -53,9 +37,9 @@ const AboutPage = () => {
   // Update document title dynamically on the client side
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.title = language === 'bn' ? 'ডেভেলপার পরিচিতি - স্মার্টনোট এআই' : 'About the Developer - SmartNote AI';
+      document.title = t.aboutPageTitleMeta;
     }
-  }, [language]);
+  }, [language, t]);
 
 
   return (
@@ -127,9 +111,6 @@ const AboutPage = () => {
   );
 };
 
-// This page uses client-side rendering for language context,
-// so dynamic metadata generation needs careful handling if full SSR i18n for metadata is required.
-// The `useEffect` hook for document.title is a client-side solution for title updates.
 export default AboutPage;
 
     
