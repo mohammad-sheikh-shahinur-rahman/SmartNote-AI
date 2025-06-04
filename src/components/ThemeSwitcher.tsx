@@ -17,7 +17,7 @@ import { Moon, Sun, Palette, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
 
-type Theme = 'default' | 'oceanic' | 'sunset';
+type Theme = 'default' | 'oceanic' | 'sunset' | 'nostalgic';
 type Mode = 'light' | 'dark';
 
 
@@ -29,6 +29,7 @@ export function ThemeSwitcher() {
     { value: 'default', label: t.themeDefault },
     { value: 'oceanic', label: t.themeOceanic },
     { value: 'sunset', label: t.themeSunset },
+    { value: 'nostalgic', label: t.themeNostalgic },
   ];
   
   const MODES: { value: Mode; label: string; icon: React.ElementType }[] = [
@@ -53,7 +54,7 @@ export function ThemeSwitcher() {
   }, []);
 
   const applyTheme = (theme: Theme) => {
-    document.documentElement.classList.remove('theme-oceanic', 'theme-sunset');
+    document.documentElement.classList.remove('theme-oceanic', 'theme-sunset', 'theme-nostalgic');
     if (theme !== 'default') {
       document.documentElement.classList.add(`theme-${theme}`);
     }
@@ -117,5 +118,3 @@ export function ThemeSwitcher() {
     </DropdownMenu>
   );
 }
-
-    

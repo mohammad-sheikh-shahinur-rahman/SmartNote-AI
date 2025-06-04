@@ -201,6 +201,84 @@
     --sidebar-border: 25 20% 25%;
     --sidebar-ring: 15 70% 65%;
   }
+
+  .theme-nostalgic {
+    --background: 35 30% 95%; /* Pale Parchment */
+    --foreground: 35 30% 20%; /* Dark Sepia Brown */
+    --card: 35 25% 92%; /* Slightly Darker Parchment */
+    --card-foreground: 35 30% 20%;
+    --popover: 35 25% 92%;
+    --popover-foreground: 35 30% 20%;
+    --primary: 210 30% 40%; /* Faded Ink Blue */
+    --primary-foreground: 35 30% 95%;
+    --secondary: 35 20% 85%; /* Muted Parchment */
+    --secondary-foreground: 35 30% 25%;
+    --muted: 35 20% 90%; 
+    --muted-foreground: 35 25% 45%;
+    --accent: 30 40% 50%; /* Muted Terracotta */
+    --accent-foreground: 35 30% 95%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 35 30% 95%;
+    --border: 35 20% 80%;
+    --input: 35 25% 90%;
+    --ring: 210 30% 40%;
+    --radius: 0.3rem; /* Slightly sharper corners for old feel */
+
+    --sidebar-background: 35 28% 93%;
+    --sidebar-foreground: 35 30% 22%;
+    --sidebar-primary: 210 30% 40%;
+    --sidebar-primary-foreground: 35 30% 95%;
+    --sidebar-accent: 30 40% 50%;
+    --sidebar-accent-foreground: 35 30% 95%;
+    --sidebar-border: 35 20% 82%;
+    --sidebar-ring: 210 30% 40%;
+  }
+
+  .theme-nostalgic.dark {
+    --background: 35 20% 15%; /* Dark Brown Paper */
+    --foreground: 35 25% 85%; /* Light Cream/Sepia Text */
+    --card: 35 20% 20%; /* Slightly Lighter Dark Brown */
+    --card-foreground: 35 25% 85%;
+    --popover: 35 20% 20%;
+    --popover-foreground: 35 25% 85%;
+    --primary: 210 40% 60%; /* Slightly Brighter Faded Ink Blue */
+    --primary-foreground: 35 20% 10%;
+    --secondary: 35 15% 25%; /* Darker Sepia */
+    --secondary-foreground: 35 25% 80%;
+    --muted: 35 15% 22%;
+    --muted-foreground: 35 25% 65%;
+    --accent: 30 50% 65%; /* Slightly Brighter Muted Terracotta */
+    --accent-foreground: 35 20% 10%;
+    --destructive: 0 60% 45%;
+    --destructive-foreground: 35 25% 85%;
+    --border: 35 15% 30%;
+    --input: 35 15% 25%;
+    --ring: 210 40% 60%;
+
+    --sidebar-background: 35 18% 13%;
+    --sidebar-foreground: 35 25% 80%;
+    --sidebar-primary: 210 40% 60%;
+    --sidebar-primary-foreground: 35 20% 10%;
+    --sidebar-accent: 30 50% 65%;
+    --sidebar-accent-foreground: 35 20% 10%;
+    --sidebar-border: 35 15% 27%;
+    --sidebar-ring: 210 40% 60%;
+  }
+
+  .theme-nostalgic .prose,
+  .theme-nostalgic.dark .prose {
+    font-family: theme('fontFamily.code');
+    color: hsl(var(--foreground)); /* Ensure prose text color matches theme */
+  }
+  
+  .theme-nostalgic .prose :where(code):not(:where([class~="not-prose"] *))::before,
+  .theme-nostalgic .prose :where(code):not(:where([class~="not-prose"] *))::after {
+    content: ""; /* Remove default backticks for code in prose for typewriter font */
+  }
+
+  .theme-nostalgic textarea#content { /* Target the main note editor textarea */
+    font-family: theme('fontFamily.code');
+  }
 }
 
 @layer base {

@@ -136,6 +136,7 @@ export const translations = {
     themeDefault: "Default",
     themeOceanic: "Oceanic",
     themeSunset: "Sunset",
+    themeNostalgic: "Nostalgic",
     modeLight: "Light",
     modeDark: "Dark",
   },
@@ -271,11 +272,10 @@ export const translations = {
     themeDefault: "ডিফল্ট",
     themeOceanic: "ওশেনিক",
     themeSunset: "সানসেট",
+    themeNostalgic: "নস্টালজিক",
     modeLight: "লাইট",
     modeDark: "ডার্ক",
   },
 };
 
 export const getTranslations = (language: Language) => translations[language];
-
-    

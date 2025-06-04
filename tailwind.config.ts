@@ -13,7 +13,7 @@ export default {
       fontFamily: {
         body: ['Hind Siliguri', 'PT Sans', 'sans-serif'], // Hind Siliguri added for Bengali
         headline: ['PT Sans', 'sans-serif'],
-        code: ['monospace'],
+        code: ['Courier Prime', 'monospace'], // Added Courier Prime for typewriter style
       },
       colors: {
         background: 'hsl(var(--background))',
