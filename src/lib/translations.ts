@@ -6,8 +6,8 @@ export const translations = {
     appTitle: 'SmartNote AI',
     languageName: 'English', // Added for explicit naming
     newNote: 'New Note',
-    toggleToBangla: 'BN', 
-    toggleToEnglish: 'EN', 
+    toggleToBangla: 'BN',
+    toggleToEnglish: 'EN',
     searchPlaceholder: "Search notes or tags...",
     viewGridView: "Grid view",
     viewListView: "List view",
@@ -24,6 +24,8 @@ export const translations = {
     footerText: "SmartNote AI",
     aboutDeveloper: "About the Developer", // Retained for potential direct link elsewhere if needed
     aboutAppFooterLink: "About SmartNote AI", // New key for footer
+    developerPageLinkText: "Developer", // New key for AppHeader link
+    developerPageLinkTooltip: "About the Developer", // New key for AppHeader link tooltip
 
     // Toast messages for HomePage
     noteUpdated: "Note Updated",
@@ -168,8 +170,8 @@ export const translations = {
     appTitle: 'স্মার্টনোট এআই',
     languageName: 'বাংলা', // Added for explicit naming
     newNote: 'নতুন নোট',
-    toggleToBangla: 'বাং', 
-    toggleToEnglish: 'EN', 
+    toggleToBangla: 'বাং',
+    toggleToEnglish: 'EN',
     searchPlaceholder: "নোট বা ট্যাগ খুঁজুন...",
     viewGridView: "গ্রিড ভিউ",
     viewListView: "তালিকা ভিউ",
@@ -186,6 +188,8 @@ export const translations = {
     footerText: "স্মার্টনোট এআই",
     aboutDeveloper: "ডেভেলপার পরিচিতি", // Retained
     aboutAppFooterLink: "স্মার্টনোট এআই পরিচিতি", // New key for footer
+    developerPageLinkText: "ডেভেলপার", // New key for AppHeader link
+    developerPageLinkTooltip: "ডেভেলপার পরিচিতি", // New key for AppHeader link tooltip
 
     // Toast messages for HomePage
     noteUpdated: "নোট আপডেট করা হয়েছে",
@@ -329,5 +333,3 @@ export const translations = {
 };
 
 export const getTranslations = (language: Language) => translations[language];
-
-    
