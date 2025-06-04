@@ -10,7 +10,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
-import React, { useEffect } from 'react'; // Import useEffect
+import React, { useEffect } from 'react'; 
+import { Check } from 'lucide-react'; // Import Check icon
 
 // Client components cannot export 'generateMetadata'.
 // Metadata for this page will be set via client-side useEffect for the document title,
@@ -20,8 +21,8 @@ const AboutPage = () => {
   const { language } = useLanguage();
   const t = getTranslations(language);
 
-  const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান"; // Name might not need translation
-  const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক"; // Titles also hardcoded in Bangla
+  const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান"; 
+  const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক"; 
   const imageUrl = "https://m.media-amazon.com/images/S/amzn-author-media-prod/b02mvc2hucu96hchlksdjmogii._SY450_CR0%2C0%2C450%2C450_.jpg";
   const shortIntro = "মোহাম্মদ শেখ শাহিনুর রহমান একজন বহুমাত্রিক প্রতিভার অধিকারী ব্যক্তিত্ব। তিনি একাধারে একজন সফটওয়্যার ইঞ্জিনিয়ার, প্রোগ্রামার, ডিজিটাল ফরেনসিক বিশেষজ্ঞ এবং প্রযুক্তি উদ্ভাবক। প্রযুক্তির জগতের বাইরেও তিনি একজন স্বনামধন্য কবি ও লেখক। তার লেখনী এবং প্রযুক্তিগত উদ্ভাবন উভয় ক্ষেত্রেই তিনি সমাজের জন্য গুরুত্বপূর্ণ অবদান রেখে চলেছেন।";
   const professionalIdentities = [
@@ -74,7 +75,7 @@ const AboutPage = () => {
               <ul className="space-y-2 text-foreground">
                 {professionalIdentities.map((identity, index) => (
                   <li key={index} className="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-primary flex-shrink-0"><path d="M20 6 9 17l-5-5"/></svg>
+                    <Check className="mr-3 h-5 w-5 text-primary flex-shrink-0" />
                     {identity}
                   </li>
                 ))}
@@ -112,5 +113,3 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
-
-    
