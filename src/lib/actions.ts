@@ -7,6 +7,8 @@ import { autoCategorizeNote } from '@/ai/flows/auto-categorize-note';
 import type { AutoCategorizeNoteInput } from '@/ai/flows/auto-categorize-note';
 import { summarizeNote } from '@/ai/flows/summarize-note';
 import type { SummarizeNoteInput } from '@/ai/flows/summarize-note';
+import { voiceToText } from '@/ai/flows/voice-to-text';
+import type { VoiceToTextInput } from '@/ai/flows/voice-to-text';
 
 export async function suggestTitleAction(
   input: SuggestNoteTitleInput
@@ -41,5 +43,17 @@ export async function summarizeNoteAction(
   } catch (error) {
     console.error('Error summarizing note:', error);
     throw new Error('Failed to summarize note. Please try again.');
+  }
+}
+
+export async function voiceToTextAction(
+  input: VoiceToTextInput
+): Promise<string> {
+  try {
+    const result = await voiceToText(input);
+    return result.text;
+  } catch (error) {
+    console.error('Error transcribing audio:', error);
+    throw new Error('Failed to transcribe audio. Please try again.');
   }
 }

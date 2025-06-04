@@ -3,14 +3,14 @@
 
 import React, { useState, useEffect, KeyboardEvent, useRef } from 'react';
 import type { Note } from '@/lib/types';
-import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction } from '@/lib/actions';
+import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction, voiceToTextAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus } from 'lucide-react';
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
@@ -33,6 +33,13 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
+  // Voice-to-text state
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+
   useEffect(() => {
     if (noteToEdit) {
       setTitle(noteToEdit.title);
@@ -45,6 +52,11 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     }
     setTagInput('');
     setGeneratedSummary(null);
+    setIsRecording(false);
+    setIsTranscribing(false);
+    setPermissionError(null);
+    mediaRecorderRef.current = null;
+    audioChunksRef.current = [];
   }, [noteToEdit, isOpen]);
 
   const handleSave = () => {
@@ -205,7 +217,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     let newContentValue = '';
     let newCursorPosStart = start;
     let newCursorPosEnd = end;
-    const placeholderText = "text"; // Default placeholder
+    const placeholderText = "text";
 
     switch (type) {
       case 'bold':
@@ -233,11 +245,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           const lines = selectedText.split('\n');
           const formattedLines = lines.map(line => '- ' + line).join('\n');
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
-          newCursorPosStart = start;
-          newCursorPosEnd = start + formattedLines.length;
         } else {
           newContentValue = textarea.value.substring(0, start) + '- List item' + textarea.value.substring(end);
-          newCursorPosStart = start + 2; // After '- '
+          newCursorPosStart = start + 2; 
           newCursorPosEnd = newCursorPosStart + 'List item'.length;
         }
         break;
@@ -246,11 +256,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           const lines = selectedText.split('\n');
           const formattedLines = lines.map((line, index) => (index + 1) + '. ' + line).join('\n');
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
-          newCursorPosStart = start;
-          newCursorPosEnd = start + formattedLines.length;
         } else {
           newContentValue = textarea.value.substring(0, start) + '1. List item' + textarea.value.substring(end);
-          newCursorPosStart = start + 3; // After '1. '
+          newCursorPosStart = start + 3; 
           newCursorPosEnd = newCursorPosStart + 'List item'.length;
         }
         break;
@@ -259,11 +267,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           const lines = selectedText.split('\n');
           const formattedLines = lines.map(line => '> ' + line).join('\n');
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
-          newCursorPosStart = start;
-          newCursorPosEnd = start + formattedLines.length;
         } else {
           newContentValue = textarea.value.substring(0, start) + '> Blockquote' + textarea.value.substring(end);
-          newCursorPosStart = start + 2; // After '> '
+          newCursorPosStart = start + 2; 
           newCursorPosEnd = newCursorPosStart + 'Blockquote'.length;
         }
         break;
@@ -282,16 +288,71 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     setTimeout(() => {
       if (textarea) {
         textarea.focus();
-        textarea.setSelectionRange(newCursorPosStart, newCursorPosEnd);
+        if (!selectedText && (type === 'bold' || type === 'italic' || type === 'code' || type === 'strikethrough' || type === 'ul' || type === 'ol' || type === 'blockquote')) {
+             textarea.setSelectionRange(newCursorPosStart, newCursorPosEnd);
+        } else {
+            textarea.setSelectionRange(newCursorPosStart, newCursorPosEnd);
+        }
       }
     }, 0);
+  };
+
+  const handleToggleRecording = async () => {
+    setPermissionError(null);
+    if (isRecording) {
+      mediaRecorderRef.current?.stop();
+      setIsRecording(false);
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorderRef.current = new MediaRecorder(stream);
+        audioChunksRef.current = [];
+
+        mediaRecorderRef.current.ondataavailable = (event) => {
+          audioChunksRef.current.push(event.data);
+        };
+
+        mediaRecorderRef.current.onstop = async () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' }); // Adjust MIME type if needed
+          const reader = new FileReader();
+          reader.readAsDataURL(audioBlob);
+          reader.onloadend = async () => {
+            const base64Audio = reader.result as string;
+            setIsTranscribing(true);
+            try {
+              const transcribedText = await voiceToTextAction({ audioDataUri: base64Audio });
+              setContent(prev => `${prev}${prev ? '\n' : ''}${transcribedText}`);
+              toast({ title: "Text Transcribed!", description: "Audio has been transcribed and added to your note." });
+            } catch (error) {
+              console.error('Failed to transcribe audio:', error);
+              toast({ title: "Transcription Error", description: "Could not transcribe audio. Please try again.", variant: "destructive" });
+            } finally {
+              setIsTranscribing(false);
+              // Clean up the stream tracks
+              stream.getTracks().forEach(track => track.stop());
+            }
+          };
+        };
+        mediaRecorderRef.current.start();
+        setIsRecording(true);
+        toast({ title: "Recording Started", description: "Microphone is now active."});
+      } catch (err) {
+        console.error("Error accessing microphone:", err);
+        if (err instanceof DOMException && err.name === "NotAllowedError") {
+            setPermissionError("Microphone permission denied. Please allow access in your browser settings.");
+        } else {
+            setPermissionError("Could not access microphone. Please ensure it's connected and enabled.");
+        }
+        toast({ title: "Microphone Error", description: "Could not access microphone.", variant: "destructive" });
+      }
+    }
   };
 
 
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) { mediaRecorderRef.current?.stream?.getTracks().forEach(track => track.stop()); setIsRecording(false); onClose(); } }}>
       <DialogContent className="sm:max-w-[700px] md:max-w-[800px] lg:max-w-[900px] bg-card text-card-foreground shadow-xl rounded-lg">
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">
@@ -352,7 +413,23 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('hr')} title="Horizontal Rule">
                 <Minus className="h-4 w-4" />
               </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleToggleRecording}
+                disabled={isTranscribing}
+                title={isRecording ? "Stop Recording" : "Start Recording"}
+                className={isRecording ? "bg-red-500 hover:bg-red-600 text-white" : ""}
+              >
+                {isTranscribing ? <Loader2 className="h-4 w-4 animate-spin" /> : (isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />)}
+              </Button>
             </div>
+            {permissionError && (
+              <div className="flex items-center p-2 mb-2 text-sm text-red-700 bg-red-100 border border-red-300 rounded-md">
+                <AlertCircle className="mr-2 h-4 w-4" />
+                {permissionError}
+              </div>
+            )}
             <Textarea
               ref={textareaRef}
               id="content"
@@ -434,7 +511,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         </div>
         <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t">
           <DialogClose asChild>
-            <Button type="button" variant="outline">
+            <Button type="button" variant="outline" onClick={() => { mediaRecorderRef.current?.stream?.getTracks().forEach(track => track.stop()); setIsRecording(false); }}>
               Cancel
             </Button>
           </DialogClose>
