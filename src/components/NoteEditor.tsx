@@ -55,16 +55,16 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const [targetLanguage, setTargetLanguage] = useState(language === 'bn' ? 'en' : 'bn'); // Default to opposite of current UI lang
 
   const availableLanguages = [
-    { value: 'bn', label: t.language === 'bn' ? 'বাংলা' : 'Bangla (Bengali)' },
-    { value: 'en', label: t.language === 'bn' ? 'ইংরেজি' : 'English' },
-    { value: 'es', label: t.language === 'bn' ? 'স্প্যানিশ' : 'Spanish' },
-    { value: 'fr', label: t.language === 'bn' ? 'ফরাসি' : 'French' },
-    { value: 'de', label: t.language === 'bn' ? 'জার্মান' : 'German' },
-    { value: 'hi', label: t.language === 'bn' ? 'হিন্দি' : 'Hindi' },
-    { value: 'ja', label: t.language === 'bn' ? 'জাপানি' : 'Japanese' },
-    { value: 'pt', label: t.language === 'bn' ? 'পর্তুগিজ' : 'Portuguese' },
-    { value: 'ru', label: t.language === 'bn' ? 'রাশিয়ান' : 'Russian' },
-    { value: 'zh', label: t.language === 'bn' ? 'চীনা (সরলীকৃত)' : 'Chinese (Simplified)' },
+    { value: 'bn', label: language === 'bn' ? 'বাংলা' : 'Bangla (Bengali)' },
+    { value: 'en', label: language === 'bn' ? 'ইংরেজি' : 'English' },
+    { value: 'es', label: language === 'bn' ? 'স্প্যানিশ' : 'Spanish' },
+    { value: 'fr', label: language === 'bn' ? 'ফরাসি' : 'French' },
+    { value: 'de', label: language === 'bn' ? 'জার্মান' : 'German' },
+    { value: 'hi', label: language === 'bn' ? 'হিন্দি' : 'Hindi' },
+    { value: 'ja', label: language === 'bn' ? 'জাপানি' : 'Japanese' },
+    { value: 'pt', label: language === 'bn' ? 'পর্তুগিজ' : 'Portuguese' },
+    { value: 'ru', label: language === 'bn' ? 'রাশিয়ান' : 'Russian' },
+    { value: 'zh', label: language === 'bn' ? 'চীনা (সরলীকৃত)' : 'Chinese (Simplified)' },
   ];
 
 
