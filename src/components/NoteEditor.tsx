@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useState, useEffect, KeyboardEvent } from 'react';
+import React, { useState, useEffect, KeyboardEvent, useRef } from 'react';
 import type { Note } from '@/lib/types';
 import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText } from 'lucide-react';
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
@@ -31,6 +31,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const { toast } = useToast();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (noteToEdit) {
@@ -43,7 +44,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       setCurrentTags([]);
     }
     setTagInput('');
-    setGeneratedSummary(null); // Reset summary when editor opens or note changes
+    setGeneratedSummary(null); 
   }, [noteToEdit, isOpen]);
 
   const handleSave = () => {
@@ -189,11 +190,38 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleInsertSummary = () => {
     if (generatedSummary) {
       setContent(prevContent => `${prevContent}\n\n## AI Summary\n${generatedSummary}`);
-      setGeneratedSummary(null); // Clear summary after inserting
+      setGeneratedSummary(null); 
       toast({ title: "Summary Inserted", description: "The AI summary has been added to your note content." });
     }
   };
 
+  const applyMarkdownFormatting = (prefix: string, suffix: string = prefix, defaultText: string = "text") => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const textToWrap = selectedText || defaultText;
+
+    const newContent =
+      textarea.value.substring(0, start) +
+      prefix +
+      textToWrap +
+      suffix +
+      textarea.value.substring(end);
+
+    setContent(newContent);
+
+    setTimeout(() => {
+      if (textarea) {
+        textarea.focus();
+        const newCursorPosStart = start + prefix.length;
+        const newCursorPosEnd = newCursorPosStart + textToWrap.length;
+        textarea.setSelectionRange(newCursorPosStart, newCursorPosEnd);
+      }
+    }, 0);
+  };
 
   if (!isOpen) return null;
 
@@ -234,11 +262,23 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             <Label htmlFor="content" className="text-left font-semibold">
               Content
             </Label>
+            <div className="flex items-center gap-1 mb-2 p-1 border rounded-md bg-muted/50">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('**')} title="Bold">
+                <Bold className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('*')} title="Italic">
+                <Italic className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('`')} title="Inline Code">
+                <Code className="h-4 w-4" />
+              </Button>
+            </div>
             <Textarea
+              ref={textareaRef}
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your note here..."
+              placeholder="Write your note here... (Markdown supported)"
               className="min-h-[250px] resize-y"
             />
           </div>
