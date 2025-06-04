@@ -32,7 +32,7 @@ const AboutAppPage = () => {
                 width={100}
                 height={100}
                 className="rounded-lg shadow-md"
-                data-ai-hint="app logo"
+                data-ai-hint="notebook lightbulb"
               />
             </div>
             <CardTitle className="text-3xl font-headline text-primary mb-1">{t.aboutAppTitle}</CardTitle>
