@@ -109,7 +109,7 @@ export default function HomePage() {
     if (isChatAccordionOpen && chatMessages.length === 0 && !isLoadingChat) {
         setChatMessages([{ sender: 'ai', text: t.aiWelcomeMessage }]);
     }
-  }, [isChatAccordionOpen, t.aiWelcomeMessage, isLoadingChat]);
+  }, [isChatAccordionOpen, t.aiWelcomeMessage, isLoadingChat, chatMessages.length]);
 
 
   const handleSaveNote = (note: Note) => {
@@ -228,7 +228,7 @@ export default function HomePage() {
                       <div key={index} className={`flex items-end gap-2 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                         {msg.sender === 'ai' && (
                           <Avatar className="h-8 w-8 self-start">
-                            <AvatarImage src="https://placehold.co/40x40.png" alt="AI" data-ai-hint="robot avatar"/>
+                            <AvatarImage src="https://static.vecteezy.com/system/resources/thumbnails/013/216/224/small/pen-and-book-logo-design-book-writer-logo-template-design-free-vector.jpg" alt="AI Advisor Logo" data-ai-hint="pen book logo"/>
                             <AvatarFallback>AI</AvatarFallback>
                           </Avatar>
                         )}
@@ -253,7 +253,7 @@ export default function HomePage() {
                     {isLoadingChat && (
                       <div className="flex items-end gap-2 justify-start">
                          <Avatar className="h-8 w-8 self-start">
-                            <AvatarImage src="https://placehold.co/40x40.png" alt="AI" data-ai-hint="robot avatar"/>
+                            <AvatarImage src="https://static.vecteezy.com/system/resources/thumbnails/013/216/224/small/pen-and-book-logo-design-book-writer-logo-template-design-free-vector.jpg" alt="AI Advisor Logo" data-ai-hint="pen book logo"/>
                             <AvatarFallback>AI</AvatarFallback>
                           </Avatar>
                         <div className="max-w-[70%] rounded-lg px-3 py-2 shadow-sm bg-background text-foreground border border-border rounded-bl-none">
@@ -399,6 +399,8 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
 
     
 
