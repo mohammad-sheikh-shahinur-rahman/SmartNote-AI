@@ -27,7 +27,7 @@ const AboutAppPage = () => {
           <CardHeader className="text-center pt-8 pb-6">
             <div className="flex justify-center mb-4">
               <Image
-                src="https://i.ibb.co/Y7xksZK/smartnote-ai-logo.png"
+                src="https://i.ibb.co/QF4Nwdq4/Chat-GPT-Image-Jun-5-2025-05-09-10-AM.png"
                 alt="SmartNote AI Logo"
                 width={100}
                 height={100}
@@ -78,5 +78,3 @@ const AboutAppPage = () => {
 };
 
 export default AboutAppPage;
-
-    
