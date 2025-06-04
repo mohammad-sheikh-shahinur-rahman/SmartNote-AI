@@ -65,10 +65,10 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => onEdit(note)}>
-            <Edit3 className="mr-2 h-4 w-4" /> {t.editButton}
+            <Edit3 className="h-4 w-4" /> {t.editButton}
           </Button>
           <Button variant="destructive" size="sm" onClick={() => onDelete(note.id)}>
-            <Trash2 className="mr-2 h-4 w-4" /> {t.deleteButton}
+            <Trash2 className="h-4 w-4" /> {t.deleteButton}
           </Button>
         </div>
       </CardFooter>
