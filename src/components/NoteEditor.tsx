@@ -3,15 +3,16 @@
 
 import React, { useState, useEffect, KeyboardEvent } from 'react';
 import type { Note } from '@/lib/types';
-import { suggestTitleAction, autoCategorizeNoteAction } from '@/lib/actions';
+import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, TagsIcon, XIcon } from 'lucide-react';
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 interface NoteEditorProps {
   isOpen: boolean;
@@ -27,6 +28,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const [tagInput, setTagInput] = useState('');
   const [isSuggestingTitle, setIsSuggestingTitle] = useState(false);
   const [isSuggestingTags, setIsSuggestingTags] = useState(false);
+  const [generatedSummary, setGeneratedSummary] = useState<string | null>(null);
+  const [isSummarizing, setIsSummarizing] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -39,7 +42,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       setContent('');
       setCurrentTags([]);
     }
-    setTagInput(''); // Reset tag input when editor opens or note changes
+    setTagInput('');
+    setGeneratedSummary(null); // Reset summary when editor opens or note changes
   }, [noteToEdit, isOpen]);
 
   const handleSave = () => {
@@ -96,7 +100,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   };
 
   const handleAddTag = () => {
-    const newTag = tagInput.trim();
+    const newTag = tagInput.trim().toLowerCase();
     if (newTag && !currentTags.includes(newTag)) {
       setCurrentTags([...currentTags, newTag]);
     }
@@ -126,12 +130,12 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     setIsSuggestingTags(true);
     try {
       const suggested = await autoCategorizeNoteAction({ noteContent: content });
-      // Merge suggested tags with existing ones, avoiding duplicates
       setCurrentTags(prevTags => {
         const newTags = [...prevTags];
         suggested.forEach(tag => {
-          if (!newTags.includes(tag)) {
-            newTags.push(tag);
+          const lowerTag = tag.toLowerCase();
+          if (!newTags.includes(lowerTag)) {
+            newTags.push(lowerTag);
           }
         });
         return newTags;
@@ -152,18 +156,56 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     }
   };
 
+  const handleSummarizeNote = async () => {
+    if (!content) {
+      toast({
+        title: "Cannot Summarize",
+        description: "Please write some content before summarizing.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSummarizing(true);
+    setGeneratedSummary(null);
+    try {
+      const summary = await summarizeNoteAction({ noteContent: content });
+      setGeneratedSummary(summary);
+      toast({
+        title: "Summary Generated!",
+        description: "AI has generated a summary for your note.",
+      });
+    } catch (error) {
+      console.error('Failed to summarize note:', error);
+      toast({
+        title: "Error Summarizing",
+        description: "Could not generate a summary. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSummarizing(false);
+    }
+  };
+
+  const handleInsertSummary = () => {
+    if (generatedSummary) {
+      setContent(prevContent => `${prevContent}\n\n## AI Summary\n${generatedSummary}`);
+      setGeneratedSummary(null); // Clear summary after inserting
+      toast({ title: "Summary Inserted", description: "The AI summary has been added to your note content." });
+    }
+  };
+
 
   if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[600px] bg-card text-card-foreground shadow-xl rounded-lg">
+      <DialogContent className="sm:max-w-[700px] md:max-w-[800px] lg:max-w-[900px] bg-card text-card-foreground shadow-xl rounded-lg">
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">
             {noteToEdit ? 'Edit Note' : 'Create New Note'}
           </DialogTitle>
         </DialogHeader>
-        <div className="grid gap-6 py-4 max-h-[70vh] overflow-y-auto pr-2">
+        <div className="grid gap-6 py-4 max-h-[75vh] overflow-y-auto pr-3 pl-1">
           <div className="grid gap-2">
             <Label htmlFor="title" className="text-left font-semibold">
               Title
@@ -174,7 +216,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Note title"
-                className="col-span-3"
+                className="flex-grow"
               />
               <Button
                 onClick={handleSuggestTitle}
@@ -197,9 +239,36 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Write your note here..."
-              className="col-span-3 min-h-[200px] resize-y"
+              className="min-h-[250px] resize-y"
             />
           </div>
+
+          <div className="flex items-center gap-2 mt-[-10px] mb-2">
+              <Button
+                onClick={handleSummarizeNote}
+                variant="outline"
+                size="sm"
+                disabled={isSummarizing || !content}
+              >
+                {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
+                Summarize
+              </Button>
+          </div>
+
+          {generatedSummary && (
+            <div className="grid gap-2 p-4 border rounded-md bg-muted/50">
+              <div className="flex justify-between items-center">
+                <Label className="text-left font-semibold text-primary">AI Generated Summary</Label>
+                <Button onClick={handleInsertSummary} variant="outline" size="sm">
+                  <FileText className="mr-2 h-4 w-4" /> Insert into Note
+                </Button>
+              </div>
+              <div className="text-sm whitespace-pre-wrap p-2 bg-background rounded">{generatedSummary}</div>
+            </div>
+          )}
+          
+          <Separator />
+
           <div className="grid gap-2">
             <Label htmlFor="tags" className="text-left font-semibold">
               Tags
