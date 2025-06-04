@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Archive, ArchiveRestore, Edit3, Pin, PinOff, Trash2, TagsIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface NoteCardProps {
   note: Note;
@@ -17,7 +19,6 @@ interface NoteCardProps {
 }
 
 const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin, onToggleArchive }) => {
-  const contentPreview = note.content.length > 100 ? `${note.content.substring(0, 100)}...` : note.content;
   const updatedAgo = formatDistanceToNow(new Date(note.updatedAt), { addSuffix: true });
 
   return (
@@ -30,7 +31,11 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
         <CardDescription>Last updated {updatedAgo}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-sm break-words whitespace-pre-wrap mb-2">{contentPreview}</p>
+        <div className="text-sm prose dark:prose-invert max-w-none prose-sm line-clamp-4 mb-2">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {note.content}
+          </ReactMarkdown>
+        </div>
         {note.tags && note.tags.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-2">
             {note.tags.slice(0, 5).map(tag => ( // Display up to 5 tags
