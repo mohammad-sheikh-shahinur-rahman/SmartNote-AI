@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
-      <html lang="en"> {/* Default lang attribute, will be updated by HtmlLangUpdater */}
+      <html lang="en">
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
