@@ -4,11 +4,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { getTranslations, Language } from '@/lib/translations'; // Import getTranslations
-
-// export const metadata: Metadata = { // Static metadata
-//   title: 'SmartNote AI',
-//   description: 'An Intelligent Note-Taking App with Gemini API',
-// };
+import HtmlLangUpdater from '@/components/HtmlLangUpdater'; // Import the new component
 
 // Function to generate dynamic metadata (will pick default 'en' or 'bn')
 // For true dynamic metadata based on user preference, a different setup is needed,
@@ -32,13 +28,14 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
-      <html lang="en"> {/* Default lang attribute, can be updated client-side if needed */}
+      <html lang="en"> {/* Default lang attribute, will be updated by HtmlLangUpdater */}
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-          <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;700&family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
         </head>
         <body className="font-body antialiased">
+          <HtmlLangUpdater />
           {children}
           <Toaster />
         </body>
@@ -46,5 +43,3 @@ export default function RootLayout({
     </LanguageProvider>
   );
 }
-
-    
