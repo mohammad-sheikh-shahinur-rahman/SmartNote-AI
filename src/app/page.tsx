@@ -217,7 +217,7 @@ export default function HomePage() {
             className="w-full mb-6 shadow-md rounded-lg bg-card"
             onValueChange={(value) => setIsChatAccordionOpen(value === "ai-chat")}
           >
-            <AccordionItem value="ai-chat">
+            <AccordionItem value="ai-chat" className="border-b-0">
               <AccordionTrigger className="px-6 py-4 text-lg font-semibold text-primary">
                 {t.chatWithAdvisorTitle}
               </AccordionTrigger>
@@ -392,16 +392,12 @@ export default function HomePage() {
       <footer className="text-center py-4 border-t text-sm text-muted-foreground">
         {t.footerText} &copy; {new Date().getFullYear()}
         <span className="mx-2">|</span>
-        <Link href="/about" className="hover:underline text-primary">
-          {t.aboutDeveloper}
+        <Link href="/about-app" className="hover:underline text-primary">
+          {t.aboutAppFooterLink}
         </Link>
       </footer>
     </div>
   );
 }
-
-    
-
-    
 
     

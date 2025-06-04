@@ -6,8 +6,8 @@ export const translations = {
     appTitle: 'SmartNote AI',
     languageName: 'English', // Added for explicit naming
     newNote: 'New Note',
-    toggleToBangla: 'EN', // If current is English, button shows EN, clicking switches to BN.
-    toggleToEnglish: 'BN', // If current is Bangla, button shows BN, clicking switches to EN.
+    toggleToBangla: 'BN', 
+    toggleToEnglish: 'EN', 
     searchPlaceholder: "Search notes or tags...",
     viewGridView: "Grid view",
     viewListView: "List view",
@@ -22,7 +22,8 @@ export const translations = {
     noArchivedNotes: "No archived notes found.",
     noArchivedNotesDesc: "Try adjusting your search or archiving some notes.",
     footerText: "SmartNote AI",
-    aboutDeveloper: "About the Developer",
+    aboutDeveloper: "About the Developer", // Retained for potential direct link elsewhere if needed
+    aboutAppFooterLink: "About SmartNote AI", // New key for footer
 
     // Toast messages for HomePage
     noteUpdated: "Note Updated",
@@ -35,10 +36,10 @@ export const translations = {
     noteArchived: "Note Archived",
     noteUnarchived: "Note Unarchived",
 
-    // AboutPage
-    aboutPageTitleMeta: "About - SmartNote AI",
-    aboutPageDescriptionMeta: "Information about SmartNote AI and its developer, Mohammad Sheikh Shahinur Rahman.",
-    aboutAppTitle: "About SmartNote AI",
+    // AboutPage (now for Developer)
+    aboutDeveloperPageTitleMeta: "About the Developer - SmartNote AI",
+    aboutPageDescriptionMeta: "Information about SmartNote AI and its developer, Mohammad Sheikh Shahinur Rahman.", // This can remain generic or be specified
+    aboutAppTitle: "About SmartNote AI", // This key is now used on the new /about-app page primarily
     aboutAppDescription: "SmartNote AI is an intelligent, user-friendly, and multilingual notebook application. It is built with Next.js, ShadCN UI, and Genkit AI. Key features include rich note editing, AI-powered auto-titles, summarization, and translation capabilities. SmartNote AI is designed to help you think faster, stay organized, and enhance your productivity.",
     shortIntroTitle: "Developer's Introduction",
     professionalIdentitiesTitle: "Professional Identity",
@@ -47,6 +48,9 @@ export const translations = {
     blogButton: "Our Society Blog",
     goBackButton: "Go back to Homepage",
     footerCopyright: "SmartNote AI © {year}",
+
+    // New About App Page
+    aboutAppPageTitleMeta: "About SmartNote AI - SmartNote AI",
 
 
     // NoteCard
@@ -164,8 +168,8 @@ export const translations = {
     appTitle: 'স্মার্টনোট এআই',
     languageName: 'বাংলা', // Added for explicit naming
     newNote: 'নতুন নোট',
-    toggleToBangla: 'বাং', // If current is Bangla, button shows বাং, clicking switches to EN.
-    toggleToEnglish: 'EN', // If current is English, button shows EN, clicking switches to BN.
+    toggleToBangla: 'বাং', 
+    toggleToEnglish: 'EN', 
     searchPlaceholder: "নোট বা ট্যাগ খুঁজুন...",
     viewGridView: "গ্রিড ভিউ",
     viewListView: "তালিকা ভিউ",
@@ -180,7 +184,8 @@ export const translations = {
     noArchivedNotes: "কোনো আর্কাইভ করা নোট পাওয়া যায়নি।",
     noArchivedNotesDesc: "আপনার অনুসন্ধান সামঞ্জস্য করুন অথবা কিছু নোট আর্কাইভ করুন।",
     footerText: "স্মার্টনোট এআই",
-    aboutDeveloper: "ডেভেলপার পরিচিতি",
+    aboutDeveloper: "ডেভেলপার পরিচিতি", // Retained
+    aboutAppFooterLink: "স্মার্টনোট এআই পরিচিতি", // New key for footer
 
     // Toast messages for HomePage
     noteUpdated: "নোট আপডেট করা হয়েছে",
@@ -193,10 +198,10 @@ export const translations = {
     noteArchived: "নোট আর্কাইভ করা হয়েছে",
     noteUnarchived: "নোট আনআর্কাইভ করা হয়েছে",
 
-    // AboutPage
-    aboutPageTitleMeta: "পরিচিতি - স্মার্টনোট এআই",
-    aboutPageDescriptionMeta: "স্মার্টনোট এআই এবং এর ডেভেলপার মোহাম্মদ শেখ শাহিনুর রহমান সম্পর্কে তথ্য।",
-    aboutAppTitle: "স্মার্টনোট এআই পরিচিতি",
+    // AboutPage (now for Developer)
+    aboutDeveloperPageTitleMeta: "ডেভেলপার পরিচিতি - স্মার্টনোট এআই",
+    aboutPageDescriptionMeta: "স্মার্টনোট এআই এবং এর ডেভেলপার মোহাম্মদ শেখ শাহিনুর রহমান সম্পর্কে তথ্য।", // Can remain
+    aboutAppTitle: "স্মার্টনোট এআই পরিচিতি", // Used on new /about-app page
     aboutAppDescription: "স্মার্টনোট এআই একটি বুদ্ধিমান, ব্যবহারকারী-বান্ধব এবং বহুভাষিক নোটবুক অ্যাপ্লিকেশন। এটি নেক্সট.জেএস, শ্যাডসিএন ইউআই এবং জেনকিট এআই এর সমন্বয়ে তৈরি করা হয়েছে। এর প্রধান বৈশিষ্ট্যগুলির মধ্যে রয়েছে উন্নত নোট সম্পাদনা, এআই দ্বারা স্বয়ংক্রিয় শিরোনাম তৈরি, নোটের সারাংশ এবং বিভিন্ন ভাষায় অনুবাদ সুবিধা। স্মার্টনোট এআই আপনাকে দ্রুত চিন্তা করতে, সহজে আপনার কাজগুলো গুছিয়ে রাখতে এবং আপনার উৎপাদনশীলতা বৃদ্ধিতে সহায়তা করার জন্য ডিজাইন করা হয়েছে।",
     shortIntroTitle: "ডেভেলপারের পরিচিতি",
     professionalIdentitiesTitle: "পেশাগত পরিচয়",
@@ -205,6 +210,10 @@ export const translations = {
     blogButton: "আমাদের সমাজ ব্লগ",
     goBackButton: "হোমপেজে ফিরে যান",
     footerCopyright: "স্মার্টনোট এআই © {year}",
+
+    // New About App Page
+    aboutAppPageTitleMeta: "অ্যাপ পরিচিতি - স্মার্টনোট এআই",
+
 
     // NoteCard
     pinnedBadge: "পিনড",
@@ -229,7 +238,7 @@ export const translations = {
     italicTooltip: "ইটালিক",
     codeTooltip: "ইনলাইন কোড",
     strikethroughTooltip: "স্ট্রাইকথ্রু",
-    ulTooltip: "অ упорядоченный তালিকা",
+    ulTooltip: "বুলেট তালিকা",
     olTooltip: "সংখ্যায়িত তালিকা",
     blockquoteTooltip: "ব্লককোট",
     hrTooltip: "অনুভূমিক রেখা",
@@ -321,3 +330,4 @@ export const translations = {
 
 export const getTranslations = (language: Language) => translations[language];
 
+    

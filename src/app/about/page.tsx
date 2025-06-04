@@ -7,21 +7,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
 import React, { useEffect } from 'react'; 
-import { Check } from 'lucide-react'; // Import Check icon
+import { Check } from 'lucide-react'; 
 
-// Client components cannot export 'generateMetadata'.
-// Metadata for this page will be set via client-side useEffect for the document title,
-// or could fall back to what's defined in a parent layout for static meta tags.
 
 const AboutPage = () => {
   const { language } = useLanguage();
   const t = getTranslations(language);
 
-  // Developer specific information (remains hardcoded as per current structure, can be moved to translations if full multilingual support for this section is needed)
   const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান"; 
   const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক"; 
   const imageUrl = "https://m.media-amazon.com/images/S/amzn-author-media-prod/b02mvc2hucu96hchlksdjmogii._SY450_CR0%2C0%2C450%2C450_.jpg";
@@ -36,10 +31,9 @@ const AboutPage = () => {
   const personalWebsite = "https://mohammad-sheikh-shahinur-rahman.vercel.app/";
   const blogLink = "https://shahinur.amadersomaj.com/";
 
-  // Update document title dynamically on the client side
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      document.title = t.aboutPageTitleMeta;
+      document.title = t.aboutDeveloperPageTitleMeta; // Use new key for developer page title
     }
   }, [language, t]);
 
@@ -66,10 +60,11 @@ const AboutPage = () => {
           </CardHeader>
           <Separator />
           <CardContent className="pt-6 px-6 md:px-8">
-            <section className="mb-8">
+            {/* App info section removed from here, now on /about-app */}
+            {/* <section className="mb-8">
               <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">{t.aboutAppTitle}</h2>
               <p className="text-foreground leading-relaxed text-justify">{t.aboutAppDescription}</p>
-            </section>
+            </section> */}
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">{t.shortIntroTitle}</h2>
@@ -125,3 +120,5 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+
+    
