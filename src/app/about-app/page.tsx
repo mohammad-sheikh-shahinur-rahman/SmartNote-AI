@@ -27,7 +27,7 @@ const AboutAppPage = () => {
           <CardHeader className="text-center pt-8 pb-6">
             <div className="flex justify-center mb-4">
               <Image
-                src="https://placehold.co/100x100.png" 
+                src="https://i.ibb.co/Y7xksZK/smartnote-ai-logo.png"
                 alt="SmartNote AI Logo"
                 width={100}
                 height={100}
