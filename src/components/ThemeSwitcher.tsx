@@ -14,22 +14,28 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Moon, Sun, Palette, Check } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslations } from '@/lib/translations';
 
 type Theme = 'default' | 'oceanic' | 'sunset';
 type Mode = 'light' | 'dark';
 
-const THEMES: { value: Theme; label: string }[] = [
-  { value: 'default', label: 'Default' },
-  { value: 'oceanic', label: 'Oceanic' },
-  { value: 'sunset', label: 'Sunset' },
-];
-
-const MODES: { value: Mode; label: string; icon: React.ElementType }[] = [
-  { value: 'light', label: 'Light', icon: Sun },
-  { value: 'dark', label: 'Dark', icon: Moon },
-];
 
 export function ThemeSwitcher() {
+  const { language } = useLanguage();
+  const t = getTranslations(language);
+
+  const THEMES: { value: Theme; label: string }[] = [
+    { value: 'default', label: t.themeDefault },
+    { value: 'oceanic', label: t.themeOceanic },
+    { value: 'sunset', label: t.themeSunset },
+  ];
+  
+  const MODES: { value: Mode; label: string; icon: React.ElementType }[] = [
+    { value: 'light', label: t.modeLight, icon: Sun },
+    { value: 'dark', label: t.modeDark, icon: Moon },
+  ];
+
   const [currentTheme, setCurrentTheme] = useState<Theme>('default');
   const [currentMode, setCurrentMode] = useState<Mode>('light');
   const [isMounted, setIsMounted] = useState(false);
@@ -75,9 +81,6 @@ export function ThemeSwitcher() {
   };
 
   if (!isMounted) {
-    // Prevent rendering on the server or before hydration to avoid mismatches
-    // A skeleton or null could be returned, but a simple button is fine here
-    // as the actual logic runs client-side.
     return (
       <Button variant="ghost" size="icon" disabled>
         <Palette className="h-5 w-5" />
@@ -88,12 +91,12 @@ export function ThemeSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Change theme">
+        <Button variant="ghost" size="icon" aria-label={t.colorThemeLabel}>
           <Palette className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Color Theme</DropdownMenuLabel>
+        <DropdownMenuLabel>{t.colorThemeLabel}</DropdownMenuLabel>
         <DropdownMenuRadioGroup value={currentTheme} onValueChange={handleThemeChange}>
           {THEMES.map((theme) => (
             <DropdownMenuRadioItem key={theme.value} value={theme.value}>
@@ -102,7 +105,7 @@ export function ThemeSwitcher() {
           ))}
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+        <DropdownMenuLabel>{t.appearanceLabel}</DropdownMenuLabel>
         {MODES.map((mode) => (
           <DropdownMenuItem key={mode.value} onClick={() => handleModeChange(mode.value)}>
             <mode.icon className="mr-2 h-4 w-4" />
@@ -114,3 +117,5 @@ export function ThemeSwitcher() {
     </DropdownMenu>
   );
 }
+
+    

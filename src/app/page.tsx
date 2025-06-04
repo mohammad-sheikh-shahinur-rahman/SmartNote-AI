@@ -100,7 +100,10 @@ export default function HomePage() {
       }
       return [note, ...prevNotes];
     });
-    toast({ title: isUpdating ? "Note Updated" : "Note Created", description: `"${note.title}" has been saved.` });
+    toast({ 
+      title: isUpdating ? t.noteUpdated : t.noteCreated, 
+      description: t.noteSavedMessage.replace('{title}', note.title || t.untitledNote) 
+    });
     setEditingNote(null); // Clear editingNote after save
   };
 
@@ -112,7 +115,11 @@ export default function HomePage() {
   const handleDeleteNote = (noteId: string) => {
     const noteToDelete = notes.find(n => n.id === noteId);
     setNotes(prevNotes => prevNotes.filter(n => n.id !== noteId));
-    toast({ title: "Note Deleted", description: `"${noteToDelete?.title || 'Untitled Note'}" has been deleted.`, variant: "destructive" });
+    toast({ 
+      title: t.noteDeleted, 
+      description: t.noteDeletedMessage.replace('{title}', noteToDelete?.title || t.untitledNote), 
+      variant: "destructive" 
+    });
   };
 
   const handleTogglePin = (noteId: string) => {
@@ -121,7 +128,7 @@ export default function HomePage() {
     );
     const note = notes.find(n => n.id === noteId);
     if (note) {
-      toast({ title: note.isPinned ? "Note Unpinned" : "Note Pinned" });
+      toast({ title: note.isPinned ? t.noteUnpinned : t.notePinned });
     }
   };
   
@@ -131,7 +138,7 @@ export default function HomePage() {
     );
     const note = notes.find(n => n.id === noteId);
     if (note) {
-      toast({ title: note.isArchived ? "Note Unarchived" : "Note Archived" });
+      toast({ title: note.isArchived ? t.noteUnarchived : t.noteArchived });
     }
   };
 
@@ -276,3 +283,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    

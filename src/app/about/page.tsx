@@ -1,4 +1,6 @@
 
+'use client';
+
 import AppHeader from '@/components/AppHeader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -6,15 +8,36 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/componen
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslations } from '@/lib/translations';
+import React from 'react'; // Import React for dynamic metadata
 
-export const metadata: Metadata = {
-  title: 'ডেভেলপার পরিচিতি - SmartNote AI',
-  description: 'স্মার্টনোট এআই এর ডেভেলপার মোহাম্মদ শেখ শাহিনুর রহমান সম্পর্কে তথ্য।',
-};
+// export const metadata: Metadata = { // This needs to be dynamic or handled differently for i18n
+//   title: 'ডেভেলপার পরিচিতি - SmartNote AI',
+//   description: 'স্মার্টনোট এআই এর ডেভেলপার মোহাম্মদ শেখ শাহিনুর রহমান সম্পর্কে তথ্য।',
+// };
+
+// Dynamic metadata generation
+export function generateMetadata(): Metadata {
+  // In a real scenario, you might get the language from context or params
+  // For simplicity here, we'll default to 'bn' for metadata or 'en' if needed.
+  // This is tricky for server components as language context is client-side.
+  // A common approach is to set metadata in the component if it's a client component,
+  // or pass lang via params if it's a server-rendered page for true i18n in metadata.
+  const t = getTranslations('bn'); // Defaulting to Bangla for metadata for now
+  return {
+    title: t.aboutPageTitleMeta,
+    description: t.aboutPageDescriptionMeta,
+  };
+}
+
 
 const AboutPage = () => {
-  const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান";
-  const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক";
+  const { language } = useLanguage();
+  const t = getTranslations(language);
+
+  const developerName = "মোহাম্মদ শেখ শাহিনুর রহমান"; // Name might not need translation
+  const developerTitles = "সফটওয়্যার ইঞ্জিনিয়ার | প্রোগ্রামার | কবি ও লেখক | ডিজিটাল ফরেনসিক বিশেষজ্ঞ | প্রযুক্তি উদ্ভাবক"; // Titles also hardcoded in Bangla
   const imageUrl = "https://m.media-amazon.com/images/S/amzn-author-media-prod/b02mvc2hucu96hchlksdjmogii._SY450_CR0%2C0%2C450%2C450_.jpg";
   const shortIntro = "মোহাম্মদ শেখ শাহিনুর রহমান একজন বহুমাত্রিক প্রতিভার অধিকারী ব্যক্তিত্ব। তিনি একাধারে একজন সফটওয়্যার ইঞ্জিনিয়ার, প্রোগ্রামার, ডিজিটাল ফরেনসিক বিশেষজ্ঞ এবং প্রযুক্তি উদ্ভাবক। প্রযুক্তির জগতের বাইরেও তিনি একজন স্বনামধন্য কবি ও লেখক। তার লেখনী এবং প্রযুক্তিগত উদ্ভাবন উভয় ক্ষেত্রেই তিনি সমাজের জন্য গুরুত্বপূর্ণ অবদান রেখে চলেছেন।";
   const professionalIdentities = [
@@ -26,6 +49,14 @@ const AboutPage = () => {
   ];
   const personalWebsite = "https://mohammad-sheikh-shahinur-rahman.vercel.app/";
   const blogLink = "https://shahinur.amadersomaj.com/";
+
+  // Update document title dynamically on the client side
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      document.title = language === 'bn' ? 'ডেভেলপার পরিচিতি - স্মার্টনোট এআই' : 'About the Developer - SmartNote AI';
+    }
+  }, [language]);
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -50,12 +81,12 @@ const AboutPage = () => {
           <Separator />
           <CardContent className="pt-6 px-6 md:px-8">
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">সংক্ষিপ্ত পরিচিতি</h2>
+              <h2 className="text-2xl font-semibold font-headline mb-3 text-accent border-b-2 border-accent/30 pb-2">{t.shortIntroTitle}</h2>
               <p className="text-foreground leading-relaxed text-justify">{shortIntro}</p>
             </section>
             
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold font-headline mb-4 text-accent border-b-2 border-accent/30 pb-2">পেশাগত পরিচয়</h2>
+              <h2 className="text-2xl font-semibold font-headline mb-4 text-accent border-b-2 border-accent/30 pb-2">{t.professionalIdentitiesTitle}</h2>
               <ul className="space-y-2 text-foreground">
                 {professionalIdentities.map((identity, index) => (
                   <li key={index} className="flex items-center">
@@ -67,16 +98,16 @@ const AboutPage = () => {
             </section>
             
             <section>
-              <h2 className="text-2xl font-semibold font-headline mb-4 text-accent border-b-2 border-accent/30 pb-2">আরও জানুন</h2>
+              <h2 className="text-2xl font-semibold font-headline mb-4 text-accent border-b-2 border-accent/30 pb-2">{t.learnMoreTitle}</h2>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button asChild variant="default" className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground py-3 text-base">
                   <Link href={personalWebsite} target="_blank" rel="noopener noreferrer">
-                    ব্যক্তিগত ওয়েবসাইট
+                    {t.personalWebsiteButton}
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" className="flex-1 bg-secondary hover:bg-secondary/80 text-secondary-foreground py-3 text-base">
                   <Link href={blogLink} target="_blank" rel="noopener noreferrer">
-                    আমাদের সমাজ ব্লগ
+                    {t.blogButton}
                   </Link>
                 </Button>
               </div>
@@ -84,16 +115,21 @@ const AboutPage = () => {
           </CardContent>
           <CardFooter className="py-6 justify-center border-t mt-6">
              <Link href="/" className="text-primary hover:underline">
-                হোমপেজে ফিরে যান
+                {t.goBackButton}
               </Link>
           </CardFooter>
         </Card>
       </main>
       <footer className="text-center py-6 border-t text-sm text-muted-foreground">
-        SmartNote AI &copy; {new Date().getFullYear()}
+        {t.footerCopyright.replace('{year}', new Date().getFullYear().toString())}
       </footer>
     </div>
   );
 };
 
+// This page uses client-side rendering for language context,
+// so dynamic metadata generation needs careful handling if full SSR i18n for metadata is required.
+// The `useEffect` hook for document.title is a client-side solution for title updates.
 export default AboutPage;
+
+    

@@ -14,6 +14,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle, Languages } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { getTranslations } from '@/lib/translations';
 
 interface NoteEditorProps {
   isOpen: boolean;
@@ -33,6 +35,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const [isSummarizing, setIsSummarizing] = useState(false);
   const { toast } = useToast();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { language } = useLanguage();
+  const t = getTranslations(language);
 
   // Voice-to-text state
   const [isRecording, setIsRecording] = useState(false);
@@ -43,20 +47,21 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 
   // Translation state
   const [isTranslating, setIsTranslating] = useState(false);
-  const [targetLanguage, setTargetLanguage] = useState('bn'); // Default to Bangla
+  const [targetLanguage, setTargetLanguage] = useState(language === 'bn' ? 'en' : 'bn'); // Default to opposite of current UI lang
 
   const availableLanguages = [
-    { value: 'bn', label: 'Bangla (Bengali)' },
-    { value: 'en', label: 'English' },
-    { value: 'es', label: 'Spanish' },
-    { value: 'fr', label: 'French' },
-    { value: 'de', label: 'German' },
-    { value: 'hi', label: 'Hindi' },
-    { value: 'ja', label: 'Japanese' },
-    { value: 'pt', label: 'Portuguese' },
-    { value: 'ru', label: 'Russian' },
-    { value: 'zh', label: 'Chinese (Simplified)' },
+    { value: 'bn', label: t.language === 'bn' ? 'বাংলা' : 'Bangla (Bengali)' },
+    { value: 'en', label: t.language === 'bn' ? 'ইংরেজি' : 'English' },
+    { value: 'es', label: t.language === 'bn' ? 'স্প্যানিশ' : 'Spanish' },
+    { value: 'fr', label: t.language === 'bn' ? 'ফরাসি' : 'French' },
+    { value: 'de', label: t.language === 'bn' ? 'জার্মান' : 'German' },
+    { value: 'hi', label: t.language === 'bn' ? 'হিন্দি' : 'Hindi' },
+    { value: 'ja', label: t.language === 'bn' ? 'জাপানি' : 'Japanese' },
+    { value: 'pt', label: t.language === 'bn' ? 'পর্তুগিজ' : 'Portuguese' },
+    { value: 'ru', label: t.language === 'bn' ? 'রাশিয়ান' : 'Russian' },
+    { value: 'zh', label: t.language === 'bn' ? 'চীনা (সরলীকৃত)' : 'Chinese (Simplified)' },
   ];
+
 
   useEffect(() => {
     if (noteToEdit) {
@@ -76,13 +81,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     mediaRecorderRef.current = null;
     audioChunksRef.current = [];
     setIsTranslating(false);
-  }, [noteToEdit, isOpen]);
+    setTargetLanguage(language === 'bn' ? 'en' : 'bn'); // Reset target language based on current UI lang
+  }, [noteToEdit, isOpen, language]);
 
   const handleSave = () => {
     if (!title && !content && currentTags.length === 0) {
       toast({
-        title: "Empty Note",
-        description: "Cannot save an empty note. Please add a title, content, or tags.",
+        title: t.emptyNoteErrorTitle,
+        description: t.emptyNoteErrorDesc,
         variant: "destructive",
       });
       return;
@@ -90,7 +96,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     const now = new Date().toISOString();
     const noteData: Note = {
       id: noteToEdit?.id || crypto.randomUUID(),
-      title: title.trim() || (noteToEdit?.title && !content && currentTags.length === 0 ? noteToEdit.title : 'Untitled Note'),
+      title: title.trim() || (noteToEdit?.title && !content && currentTags.length === 0 ? noteToEdit.title : t.untitledNote),
       content: content.trim(),
       tags: currentTags,
       createdAt: noteToEdit?.createdAt || now,
@@ -105,8 +111,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleSuggestTitle = async () => {
     if (!content) {
       toast({
-        title: "Cannot Suggest Title",
-        description: "Please write some content before suggesting a title.",
+        title: t.suggestTitleErrorTitle,
+        description: t.suggestTitleErrorDesc,
         variant: "destructive",
       });
       return;
@@ -116,14 +122,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       const suggestedTitle = await suggestTitleAction({ noteContent: content });
       setTitle(suggestedTitle);
       toast({
-        title: "Title Suggested!",
-        description: `AI suggested: "${suggestedTitle}"`,
+        title: t.titleSuggestedToastTitle,
+        description: t.titleSuggestedToastDesc.replace('{title}', suggestedTitle),
       });
     } catch (error) {
       console.error('Failed to suggest title:', error);
       toast({
-        title: "Error",
-        description: "Could not suggest a title. Please try again.",
+        title: t.suggestTitleFailToastTitle,
+        description: t.suggestTitleFailToastDesc,
         variant: "destructive",
       });
     } finally {
@@ -153,8 +159,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleSuggestTags = async () => {
     if (!content) {
       toast({
-        title: "Cannot Suggest Tags",
-        description: "Please write some content before suggesting tags.",
+        title: t.suggestTagsErrorTitle,
+        description: t.suggestTagsErrorDesc,
         variant: "destructive",
       });
       return;
@@ -173,14 +179,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         return newTags;
       });
       toast({
-        title: "Tags Suggested!",
-        description: `AI suggested ${suggested.length} new tag(s).`,
+        title: t.tagsSuggestedToastTitle,
+        description: t.tagsSuggestedToastDesc.replace('{count}', suggested.length.toString()),
       });
     } catch (error) {
       console.error('Failed to suggest tags:', error);
       toast({
-        title: "Error",
-        description: "Could not suggest tags. Please try again.",
+        title: t.suggestTagsFailToastTitle,
+        description: t.suggestTagsFailToastDesc,
         variant: "destructive",
       });
     } finally {
@@ -191,8 +197,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleSummarizeNote = async () => {
     if (!content) {
       toast({
-        title: "Cannot Summarize",
-        description: "Please write some content before summarizing.",
+        title: t.summarizeErrorTitle,
+        description: t.summarizeErrorDesc,
         variant: "destructive",
       });
       return;
@@ -203,14 +209,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       const summary = await summarizeNoteAction({ noteContent: content });
       setGeneratedSummary(summary);
       toast({
-        title: "Summary Generated!",
-        description: "AI has generated a summary for your note.",
+        title: t.summaryGeneratedToastTitle,
+        description: t.summaryGeneratedToastDesc,
       });
     } catch (error) {
       console.error('Failed to summarize note:', error);
       toast({
-        title: "Error Summarizing",
-        description: "Could not generate a summary. Please try again.",
+        title: t.summarizeFailToastTitle,
+        description: t.summarizeFailToastDesc,
         variant: "destructive",
       });
     } finally {
@@ -220,9 +226,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 
   const handleInsertSummary = () => {
     if (generatedSummary) {
-      setContent(prevContent => `${prevContent}\n\n## AI Summary\n${generatedSummary}`);
+      setContent(prevContent => `${prevContent}\n\n## ${t.aiSummaryLabel}\n${generatedSummary}`);
       setGeneratedSummary(null);
-      toast({ title: "Summary Inserted", description: "The AI summary has been added to your note content." });
+      toast({ title: t.summaryInsertedToastTitle, description: t.summaryInsertedToastDesc });
     }
   };
 
@@ -341,10 +347,10 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             try {
               const transcribedText = await voiceToTextAction({ audioDataUri: base64Audio });
               setContent(prev => `${prev}${prev ? '\n' : ''}${transcribedText}`);
-              toast({ title: "Text Transcribed!", description: "Audio has been transcribed and added to your note." });
+              toast({ title: t.transcribedToastTitle, description: t.transcribedToastDesc });
             } catch (error) {
               console.error('Failed to transcribe audio:', error);
-              toast({ title: "Transcription Error", description: "Could not transcribe audio. Please try again.", variant: "destructive" });
+              toast({ title: t.transcriptionErrorToastTitle, description: t.transcriptionErrorToastDesc, variant: "destructive" });
             } finally {
               setIsTranscribing(false);
               stream.getTracks().forEach(track => track.stop());
@@ -353,15 +359,15 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         };
         mediaRecorderRef.current.start();
         setIsRecording(true);
-        toast({ title: "Recording Started", description: "Microphone is now active."});
+        toast({ title: t.recordingStartedToastTitle, description: t.recordingStartedToastDesc});
       } catch (err) {
         console.error("Error accessing microphone:", err);
         if (err instanceof DOMException && err.name === "NotAllowedError") {
-            setPermissionError("Microphone permission denied. Please allow access in your browser settings.");
+            setPermissionError(t.microphonePermissionError);
         } else {
-            setPermissionError("Could not access microphone. Please ensure it's connected and enabled.");
+            setPermissionError(t.microphoneAccessError);
         }
-        toast({ title: "Microphone Error", description: "Could not access microphone.", variant: "destructive" });
+        toast({ title: t.microphoneErrorToastTitle, description: t.microphoneErrorToastDesc, variant: "destructive" });
       }
     }
   };
@@ -369,8 +375,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const handleTranslateNote = async () => {
     if (!content) {
       toast({
-        title: "Cannot Translate",
-        description: "Please write some content before translating.",
+        title: t.translateErrorTitle,
+        description: t.translateErrorDesc,
         variant: "destructive",
       });
       return;
@@ -381,14 +387,14 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       setContent(translatedContent);
       const languageLabel = availableLanguages.find(lang => lang.value === targetLanguage)?.label || targetLanguage;
       toast({
-        title: "Note Translated!",
-        description: `Content has been translated to ${languageLabel}.`,
+        title: t.translationDoneToastTitle,
+        description: t.translationDoneToastDesc.replace('{language}', languageLabel),
       });
     } catch (error) {
       console.error('Failed to translate note:', error);
       toast({
-        title: "Error Translating",
-        description: "Could not translate the note. Please try again.",
+        title: t.translateFailToastTitle,
+        description: t.translateFailToastDesc,
         variant: "destructive",
       });
     } finally {
@@ -404,20 +410,20 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
       <DialogContent className="sm:max-w-[700px] md:max-w-[800px] lg:max-w-[900px] bg-card text-card-foreground shadow-xl rounded-lg">
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">
-            {noteToEdit ? 'Edit Note' : 'Create New Note'}
+            {noteToEdit ? t.dialogTitleEdit : t.dialogTitleCreate}
           </DialogTitle>
         </DialogHeader>
         <div className="grid gap-6 py-4 max-h-[75vh] overflow-y-auto pr-3 pl-1">
           <div className="grid gap-2">
             <Label htmlFor="title" className="text-left font-semibold">
-              Title
+              {t.titleLabel}
             </Label>
             <div className="flex items-center gap-2">
               <Input
                 id="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Note title"
+                placeholder={t.titlePlaceholder}
                 className="flex-grow"
               />
               <Button
@@ -425,8 +431,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 variant="outline"
                 size="icon"
                 disabled={isSuggestingTitle || !content}
-                aria-label="Suggest Title"
-                title="Suggest Title (requires content)"
+                aria-label={t.suggestTitleTooltip}
+                title={t.suggestTitleTooltip}
               >
                 {isSuggestingTitle ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
               </Button>
@@ -434,31 +440,31 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           </div>
           <div className="grid gap-2">
             <Label htmlFor="content" className="text-left font-semibold">
-              Content
+              {t.contentLabel}
             </Label>
             <div className="flex items-center gap-1 mb-2 p-1 border rounded-md bg-muted/50 flex-wrap">
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('bold')} title="Bold">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('bold')} title={t.boldTooltip}>
                 <Bold className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('italic')} title="Italic">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('italic')} title={t.italicTooltip}>
                 <Italic className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('code')} title="Inline Code">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('code')} title={t.codeTooltip}>
                 <Code className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('strikethrough')} title="Strikethrough">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('strikethrough')} title={t.strikethroughTooltip}>
                 <Strikethrough className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ul')} title="Unordered List">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ul')} title={t.ulTooltip}>
                 <List className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ol')} title="Ordered List">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('ol')} title={t.olTooltip}>
                 <ListOrdered className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('blockquote')} title="Blockquote">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('blockquote')} title={t.blockquoteTooltip}>
                 <Quote className="h-4 w-4" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('hr')} title="Horizontal Rule">
+              <Button variant="outline" size="icon" onClick={() => applyMarkdownFormatting('hr')} title={t.hrTooltip}>
                 <Minus className="h-4 w-4" />
               </Button>
               <Button
@@ -466,7 +472,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 size="icon"
                 onClick={handleToggleRecording}
                 disabled={isTranscribing}
-                title={isRecording ? "Stop Recording" : "Start Recording"}
+                title={isRecording ? t.recordTooltipStop : t.recordTooltipStart}
                 className={isRecording ? "bg-red-500 hover:bg-red-600 text-white" : ""}
               >
                 {isTranscribing ? <Loader2 className="h-4 w-4 animate-spin" /> : (isRecording ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />)}
@@ -483,7 +489,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               id="content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              placeholder="Write your note here... (Markdown supported)"
+              placeholder={t.contentPlaceholder}
               className="min-h-[250px] resize-y"
             />
           </div>
@@ -496,12 +502,12 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 disabled={isSummarizing || !content}
               >
                 {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
-                Summarize
+                {t.summarizeButton}
               </Button>
               <div className="flex items-center gap-2">
                 <Select value={targetLanguage} onValueChange={setTargetLanguage}>
                   <SelectTrigger className="w-[180px] h-9 text-sm">
-                    <SelectValue placeholder="Select language" />
+                    <SelectValue placeholder={t.selectLanguagePlaceholder} />
                   </SelectTrigger>
                   <SelectContent>
                     {availableLanguages.map(lang => (
@@ -518,7 +524,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                   disabled={isTranslating || !content}
                 >
                   {isTranslating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Languages className="mr-2 h-4 w-4" />}
-                  Translate
+                  {t.translateButton}
                 </Button>
               </div>
           </div>
@@ -526,9 +532,9 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           {generatedSummary && (
             <div className="grid gap-2 p-4 border rounded-md bg-muted/50">
               <div className="flex justify-between items-center">
-                <Label className="text-left font-semibold text-primary">AI Generated Summary</Label>
+                <Label className="text-left font-semibold text-primary">{t.aiSummaryLabel}</Label>
                 <Button onClick={handleInsertSummary} variant="outline" size="sm">
-                  <FileText className="mr-2 h-4 w-4" /> Insert into Note
+                  <FileText className="mr-2 h-4 w-4" /> {t.insertSummaryButton}
                 </Button>
               </div>
               <div className="text-sm whitespace-pre-wrap p-2 bg-background rounded">{generatedSummary}</div>
@@ -539,7 +545,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 
           <div className="grid gap-2">
             <Label htmlFor="tags" className="text-left font-semibold">
-              Tags
+              {t.tagsLabelEditor}
             </Label>
             <div className="flex items-center gap-2">
               <Input
@@ -547,17 +553,17 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyDown={handleTagInputKeyDown}
-                placeholder="Add a tag and press Enter"
+                placeholder={t.addTagPlaceholder}
                 className="flex-grow"
               />
-              <Button onClick={handleAddTag} variant="outline" size="sm">Add Tag</Button>
+              <Button onClick={handleAddTag} variant="outline" size="sm">{t.addTagButton}</Button>
               <Button
                 onClick={handleSuggestTags}
                 variant="outline"
                 size="icon"
                 disabled={isSuggestingTags || !content}
-                aria-label="Suggest Tags"
-                title="Suggest Tags (requires content)"
+                aria-label={t.suggestTagsTooltip}
+                title={t.suggestTagsTooltip}
               >
                 {isSuggestingTags ? <Loader2 className="h-4 w-4 animate-spin" /> : <TagsIcon className="h-4 w-4" />}
               </Button>
@@ -570,7 +576,8 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                     <button
                       onClick={() => handleRemoveTag(tag)}
                       className="ml-1.5 p-0.5 rounded-full hover:bg-muted-foreground/20"
-                      aria-label={`Remove tag ${tag}`}
+                      aria-label={t.removeTagTooltip.replace('{tag}', tag)}
+                       title={t.removeTagTooltip.replace('{tag}', tag)}
                     >
                       <XIcon className="h-3 w-3" />
                     </button>
@@ -583,11 +590,11 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         <DialogFooter className="gap-2 sm:gap-0 pt-4 border-t">
           <DialogClose asChild>
             <Button type="button" variant="outline" onClick={() => { mediaRecorderRef.current?.stream?.getTracks().forEach(track => track.stop()); setIsRecording(false); }}>
-              Cancel
+              {t.cancelButton}
             </Button>
           </DialogClose>
           <Button type="button" onClick={handleSave} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-            Save Note
+            {t.saveButton}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -596,3 +603,5 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 };
 
 export default NoteEditor;
+
+    

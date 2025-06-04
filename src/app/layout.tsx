@@ -3,11 +3,27 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { LanguageProvider } from '@/contexts/LanguageContext';
+import { getTranslations, Language } from '@/lib/translations'; // Import getTranslations
 
-export const metadata: Metadata = {
-  title: 'SmartNote AI',
-  description: 'An Intelligent Note-Taking App with Gemini API',
-};
+// export const metadata: Metadata = { // Static metadata
+//   title: 'SmartNote AI',
+//   description: 'An Intelligent Note-Taking App with Gemini API',
+// };
+
+// Function to generate dynamic metadata (will pick default 'en' or 'bn')
+// For true dynamic metadata based on user preference, a different setup is needed,
+// as language context is client-side. This provides a basic server-side default.
+export async function generateMetadata({ params }: { params: { lang?: Language } }): Promise<Metadata> {
+  // Determine language (e.g., from URL params if set up that way, or default)
+  const lang = params?.lang || 'en'; // Default to English if no lang param
+  const t = getTranslations(lang as Language); // Cast as Language
+
+  return {
+    title: t.appTitle,
+    description: t.appTitle, // Could be more specific if needed
+  };
+}
+
 
 export default function RootLayout({
   children,
@@ -16,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <LanguageProvider>
-      <html lang="en">
+      <html lang="en"> {/* Default lang attribute, can be updated client-side if needed */}
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -30,3 +46,5 @@ export default function RootLayout({
     </LanguageProvider>
   );
 }
+
+    
