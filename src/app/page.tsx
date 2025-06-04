@@ -217,8 +217,8 @@ export default function HomePage() {
             className="w-full mb-6 shadow-md rounded-lg bg-card"
             onValueChange={(value) => setIsChatAccordionOpen(value === "ai-chat")}
           >
-            <AccordionItem value="ai-chat">
-              <AccordionTrigger className="px-6 py-4 text-lg font-semibold text-primary hover:no-underline data-[state=open]:border-b">
+            <AccordionItem value="ai-chat" className="border-b-0">
+              <AccordionTrigger className="px-6 py-4 text-lg font-semibold text-primary hover:no-underline hover:bg-secondary transition-colors duration-150 data-[state=open]:border-b data-[state=open]:rounded-b-none data-[state=closed]:rounded-lg">
                 {t.chatWithAdvisorTitle}
               </AccordionTrigger>
               <AccordionContent className="px-6 pt-0 pb-4">
@@ -399,3 +399,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    
