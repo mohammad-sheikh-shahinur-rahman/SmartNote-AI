@@ -4,9 +4,10 @@ export type Language = 'en' | 'bn';
 export const translations = {
   en: {
     appTitle: 'SmartNote AI',
+    languageName: 'English', // Added for explicit naming
     newNote: 'New Note',
-    toggleToBangla: 'BN',
-    toggleToEnglish: 'EN',
+    toggleToBangla: 'BN', // Text indicating the language to switch TO, or current if interpreted differently
+    toggleToEnglish: 'EN', // Text indicating the language to switch TO, or current if interpreted differently
     searchPlaceholder: "Search notes or tags...",
     viewGridView: "Grid view",
     viewListView: "List view",
@@ -159,9 +160,10 @@ export const translations = {
   },
   bn: {
     appTitle: 'স্মার্টনোট এআই',
+    languageName: 'বাংলা', // Added for explicit naming
     newNote: 'নতুন নোট',
-    toggleToBangla: 'বাং',
-    toggleToEnglish: 'EN',
+    toggleToBangla: 'বাং', // Text indicating the language to switch TO, or current if interpreted differently
+    toggleToEnglish: 'EN', // Text indicating the language to switch TO, or current if interpreted differently
     searchPlaceholder: "নোট বা ট্যাগ খুঁজুন...",
     viewGridView: "গ্রিড ভিউ",
     viewListView: "তালিকা ভিউ",
@@ -314,3 +316,4 @@ export const translations = {
 };
 
 export const getTranslations = (language: Language) => translations[language];
+

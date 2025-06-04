@@ -539,7 +539,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             />
           </div>
 
-          <div className="flex flex-wrap items-stretch gap-2 mt-[-10px] mb-2">
+          <div className="flex flex-wrap items-stretch gap-2 my-4">
               <Button
                 onClick={handleSummarizeNote}
                 variant="outline"
@@ -610,8 +610,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             </div>
           )}
 
-
-          <Separator />
+          <Separator className="my-4" />
 
           <div className="grid gap-2">
             <Label htmlFor="tags" className="text-left font-semibold">
@@ -673,3 +672,4 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
 };
 
 export default NoteEditor;
+
