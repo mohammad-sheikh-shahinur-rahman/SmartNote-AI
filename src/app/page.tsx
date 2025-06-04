@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -22,6 +23,7 @@ const initialNotes: Note[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
     isPinned: true,
     isArchived: false,
+    tags: ['project alpha', 'meeting', 'q3 goals']
   },
   {
     id: '2',
@@ -31,6 +33,7 @@ const initialNotes: Note[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(), // 1 day ago
     isPinned: false,
     isArchived: false,
+    tags: ['ideas', 'app development', 'brainstorming']
   },
   {
     id: '3',
@@ -40,6 +43,7 @@ const initialNotes: Note[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 30).toISOString(), // 30 minutes ago
     isPinned: false,
     isArchived: false,
+    tags: ['shopping', 'urgent']
   },
     {
     id: '4',
@@ -49,6 +53,7 @@ const initialNotes: Note[] = [
     updatedAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 250).toISOString(), // 250 days ago
     isPinned: false,
     isArchived: true,
+    tags: ['archive', 'old ideas']
   },
 ];
 
@@ -64,8 +69,6 @@ export default function HomePage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Simulate loading notes, e.g., from local storage or API
-    // For now, use initialNotes on first load if localStorage is empty
     const storedNotes = localStorage.getItem('smartnote-ai-notes');
     if (storedNotes) {
       setNotes(JSON.parse(storedNotes));
@@ -75,14 +78,14 @@ export default function HomePage() {
   }, []);
 
   useEffect(() => {
-    // Save notes to localStorage whenever they change
-    if (notes.length > 0 || localStorage.getItem('smartnote-ai-notes')) { // only save if notes were initially loaded or modified
+    if (notes.length > 0 || localStorage.getItem('smartnote-ai-notes')) {
         localStorage.setItem('smartnote-ai-notes', JSON.stringify(notes));
     }
   }, [notes]);
 
 
   const handleSaveNote = (note: Note) => {
+    const isUpdating = !!editingNote;
     setNotes(prevNotes => {
       const existingNoteIndex = prevNotes.findIndex(n => n.id === note.id);
       if (existingNoteIndex > -1) {
@@ -92,8 +95,8 @@ export default function HomePage() {
       }
       return [note, ...prevNotes];
     });
-    toast({ title: noteToEdit ? "Note Updated" : "Note Created", description: `"${note.title}" has been saved.` });
-    setEditingNote(null);
+    toast({ title: isUpdating ? "Note Updated" : "Note Created", description: `"${note.title}" has been saved.` });
+    setEditingNote(null); // Clear editingNote after save
   };
 
   const handleEditNote = (note: Note) => {
@@ -134,8 +137,10 @@ export default function HomePage() {
 
   const filteredNotes = useMemo(() => {
     return notes.filter(note => {
-      const matchesSearch = note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           note.content.toLowerCase().includes(searchTerm.toLowerCase());
+      const searchLower = searchTerm.toLowerCase();
+      const matchesSearch = note.title.toLowerCase().includes(searchLower) ||
+                           note.content.toLowerCase().includes(searchLower) ||
+                           (note.tags && note.tags.some(tag => tag.toLowerCase().includes(searchLower)));
       const matchesArchiveStatus = showArchived ? note.isArchived : !note.isArchived;
       return matchesSearch && matchesArchiveStatus;
     });
@@ -155,7 +160,7 @@ export default function HomePage() {
           <div className="relative w-full sm:max-w-xs">
             <Input
               type="search"
-              placeholder="Search notes..."
+              placeholder="Search notes or tags..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -251,7 +256,7 @@ export default function HomePage() {
 
         <NoteEditor
           isOpen={isEditorOpen}
-          onClose={() => setIsEditorOpen(false)}
+          onClose={() => { setIsEditorOpen(false); setEditingNote(null); }}
           onSave={handleSaveNote}
           noteToEdit={editingNote}
         />

@@ -1,10 +1,11 @@
+
 'use client';
 
 import type { Note } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Archive, ArchiveRestore, Edit3, Pin, PinOff, Trash2 } from 'lucide-react';
+import { Archive, ArchiveRestore, Edit3, Pin, PinOff, Trash2, TagsIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface NoteCardProps {
@@ -29,11 +30,21 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onEdit, onDelete, onTogglePin
         <CardDescription>Last updated {updatedAgo}</CardDescription>
       </CardHeader>
       <CardContent className="flex-grow">
-        <p className="text-sm break-words whitespace-pre-wrap">{contentPreview}</p>
+        <p className="text-sm break-words whitespace-pre-wrap mb-2">{contentPreview}</p>
+        {note.tags && note.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mt-2">
+            {note.tags.slice(0, 5).map(tag => ( // Display up to 5 tags
+              <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
+            ))}
+            {note.tags.length > 5 && (
+              <Badge variant="outline" className="text-xs">+{note.tags.length - 5} more</Badge>
+            )}
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-2 pt-4 border-t">
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" onClick={() => onTogglePin(note.id)} aria-label={note.isPinned ? "Unpin note" : "Pin note"}>
+          <Button variant="ghost" size="icon" onClick={() => onTogglePin(note.id)} aria-label={note.isPinned ? "Unpin note" : "Pin note"} disabled={note.isArchived}>
             {note.isPinned ? <PinOff className="h-5 w-5 text-primary" /> : <Pin className="h-5 w-5" />}
           </Button>
           <Button variant="ghost" size="icon" onClick={() => onToggleArchive(note.id)} aria-label={note.isArchived ? "Unarchive note" : "Archive note"}>
