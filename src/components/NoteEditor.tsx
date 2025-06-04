@@ -3,14 +3,15 @@
 
 import React, { useState, useEffect, KeyboardEvent, useRef } from 'react';
 import type { Note } from '@/lib/types';
-import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction, voiceToTextAction } from '@/lib/actions';
+import { suggestTitleAction, autoCategorizeNoteAction, summarizeNoteAction, voiceToTextAction, translateNoteAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Sparkles, Loader2, TagsIcon, XIcon, Lightbulb, FileText, Bold, Italic, Code, Strikethrough, List, ListOrdered, Quote, Minus, Mic, MicOff, AlertCircle, Languages } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 
@@ -40,6 +41,23 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
   const audioChunksRef = useRef<Blob[]>([]);
   const [permissionError, setPermissionError] = useState<string | null>(null);
 
+  // Translation state
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [targetLanguage, setTargetLanguage] = useState('bn'); // Default to Bangla
+
+  const availableLanguages = [
+    { value: 'bn', label: 'Bangla (Bengali)' },
+    { value: 'en', label: 'English' },
+    { value: 'es', label: 'Spanish' },
+    { value: 'fr', label: 'French' },
+    { value: 'de', label: 'German' },
+    { value: 'hi', label: 'Hindi' },
+    { value: 'ja', label: 'Japanese' },
+    { value: 'pt', label: 'Portuguese' },
+    { value: 'ru', label: 'Russian' },
+    { value: 'zh', label: 'Chinese (Simplified)' },
+  ];
+
   useEffect(() => {
     if (noteToEdit) {
       setTitle(noteToEdit.title);
@@ -57,6 +75,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
     setPermissionError(null);
     mediaRecorderRef.current = null;
     audioChunksRef.current = [];
+    setIsTranslating(false);
   }, [noteToEdit, isOpen]);
 
   const handleSave = () => {
@@ -247,7 +266,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
         } else {
           newContentValue = textarea.value.substring(0, start) + '- List item' + textarea.value.substring(end);
-          newCursorPosStart = start + 2; 
+          newCursorPosStart = start + 2;
           newCursorPosEnd = newCursorPosStart + 'List item'.length;
         }
         break;
@@ -258,7 +277,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
         } else {
           newContentValue = textarea.value.substring(0, start) + '1. List item' + textarea.value.substring(end);
-          newCursorPosStart = start + 3; 
+          newCursorPosStart = start + 3;
           newCursorPosEnd = newCursorPosStart + 'List item'.length;
         }
         break;
@@ -269,7 +288,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
           newContentValue = textarea.value.substring(0, start) + formattedLines + textarea.value.substring(end);
         } else {
           newContentValue = textarea.value.substring(0, start) + '> Blockquote' + textarea.value.substring(end);
-          newCursorPosStart = start + 2; 
+          newCursorPosStart = start + 2;
           newCursorPosEnd = newCursorPosStart + 'Blockquote'.length;
         }
         break;
@@ -313,7 +332,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         };
 
         mediaRecorderRef.current.onstop = async () => {
-          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' }); // Adjust MIME type if needed
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
           const reader = new FileReader();
           reader.readAsDataURL(audioBlob);
           reader.onloadend = async () => {
@@ -328,7 +347,6 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
               toast({ title: "Transcription Error", description: "Could not transcribe audio. Please try again.", variant: "destructive" });
             } finally {
               setIsTranscribing(false);
-              // Clean up the stream tracks
               stream.getTracks().forEach(track => track.stop());
             }
           };
@@ -345,6 +363,36 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
         }
         toast({ title: "Microphone Error", description: "Could not access microphone.", variant: "destructive" });
       }
+    }
+  };
+
+  const handleTranslateNote = async () => {
+    if (!content) {
+      toast({
+        title: "Cannot Translate",
+        description: "Please write some content before translating.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsTranslating(true);
+    try {
+      const translatedContent = await translateNoteAction({ content, targetLanguage });
+      setContent(translatedContent);
+      const languageLabel = availableLanguages.find(lang => lang.value === targetLanguage)?.label || targetLanguage;
+      toast({
+        title: "Note Translated!",
+        description: `Content has been translated to ${languageLabel}.`,
+      });
+    } catch (error) {
+      console.error('Failed to translate note:', error);
+      toast({
+        title: "Error Translating",
+        description: "Could not translate the note. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -440,7 +488,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
             />
           </div>
 
-          <div className="flex items-center gap-2 mt-[-10px] mb-2">
+          <div className="flex items-center gap-2 mt-[-10px] mb-2 flex-wrap">
               <Button
                 onClick={handleSummarizeNote}
                 variant="outline"
@@ -450,6 +498,29 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ isOpen, onClose, onSave, noteTo
                 {isSummarizing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Lightbulb className="mr-2 h-4 w-4" />}
                 Summarize
               </Button>
+              <div className="flex items-center gap-2">
+                <Select value={targetLanguage} onValueChange={setTargetLanguage}>
+                  <SelectTrigger className="w-[180px] h-9 text-sm">
+                    <SelectValue placeholder="Select language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableLanguages.map(lang => (
+                      <SelectItem key={lang.value} value={lang.value} className="text-sm">
+                        {lang.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  onClick={handleTranslateNote}
+                  variant="outline"
+                  size="sm"
+                  disabled={isTranslating || !content}
+                >
+                  {isTranslating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Languages className="mr-2 h-4 w-4" />}
+                  Translate
+                </Button>
+              </div>
           </div>
 
           {generatedSummary && (

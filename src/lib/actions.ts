@@ -9,6 +9,8 @@ import { summarizeNote } from '@/ai/flows/summarize-note';
 import type { SummarizeNoteInput } from '@/ai/flows/summarize-note';
 import { voiceToText } from '@/ai/flows/voice-to-text';
 import type { VoiceToTextInput } from '@/ai/flows/voice-to-text';
+import { translateNote } from '@/ai/flows/translate-note';
+import type { TranslateNoteInput } from '@/ai/flows/translate-note';
 
 export async function suggestTitleAction(
   input: SuggestNoteTitleInput
@@ -55,5 +57,17 @@ export async function voiceToTextAction(
   } catch (error) {
     console.error('Error transcribing audio:', error);
     throw new Error('Failed to transcribe audio. Please try again.');
+  }
+}
+
+export async function translateNoteAction(
+  input: TranslateNoteInput
+): Promise<string> {
+  try {
+    const result = await translateNote(input);
+    return result.translatedContent;
+  } catch (error) {
+    console.error('Error translating note:', error);
+    throw new Error('Failed to translate note. Please try again.');
   }
 }
