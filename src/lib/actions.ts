@@ -28,8 +28,21 @@ export async function suggestTitleAction(
     }
     return result.title;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in suggestTitleAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in suggestTitleAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to suggest title. Please try again.');
   }
 }
@@ -45,8 +58,21 @@ export async function autoCategorizeNoteAction(
     }
     return result.suggestedTags;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in autoCategorizeNoteAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in autoCategorizeNoteAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to suggest tags. Please try again.');
   }
 }
@@ -61,10 +87,22 @@ export async function summarizeNoteAction(
       throw new Error('Failed to get a valid summary from AI.');
     }
     return result.summary;
-  } catch (error)
- {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in summarizeNoteAction:', JSON.stringify(errorDetails, null, 2));
+  } catch (error) {
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in summarizeNoteAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to summarize note. Please try again.');
   }
 }
@@ -80,8 +118,21 @@ export async function voiceToTextAction(
     }
     return result.text;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in voiceToTextAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in voiceToTextAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to transcribe audio. Please try again.');
   }
 }
@@ -97,8 +148,21 @@ export async function translateNoteAction(
     }
     return result.translatedContent;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in translateNoteAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in translateNoteAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to translate note. Please try again.');
   }
 }
@@ -114,8 +178,21 @@ export async function getAIAdviceAction(
     }
     return result.advice;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in getAIAdviceAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in getAIAdviceAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     throw new Error('Failed to get AI advice. Please try again.');
   }
 }
@@ -125,17 +202,27 @@ export async function chatWithAdvisorAction(
 ): Promise<string> {
   try {
     const result: ChatWithAdvisorOutput = await chatWithAdvisor(input);
-    // The chatAdvisorFlow itself handles the case where output might be null and returns a default aiResponse.
-    // So, we can expect result.aiResponse to be a string.
     if (!result || typeof result.aiResponse !== 'string') {
         console.error('chatWithAdvisorAction: AI flow returned unexpected result structure. Result:', result);
-        // This case should ideally not be hit if chatAdvisorFlow is robust.
         return 'Sorry Boss, I encountered an unexpected issue. Please try again.';
     }
     return result.aiResponse;
   } catch (error) {
-    const errorDetails = error instanceof Error ? { message: error.message, stack: error.stack, name: error.name, ...error } : { error };
-    console.error('Error in chatWithAdvisorAction:', JSON.stringify(errorDetails, null, 2));
+    let errorDetailsForLogging: Record<string, any>;
+    if (error instanceof Error) {
+        errorDetailsForLogging = { name: error.name, message: error.message };
+        if (error.stack) {
+            errorDetailsForLogging.stack = error.stack;
+        }
+        for (const key of Object.keys(error)) {
+            if (key !== 'name' && key !== 'message' && key !== 'stack') {
+                errorDetailsForLogging[key] = (error as any)[key];
+            }
+        }
+    } else {
+        errorDetailsForLogging = { capturedError: error };
+    }
+    console.error('Error in chatWithAdvisorAction:', JSON.stringify(errorDetailsForLogging, null, 2));
     if (error instanceof Error && error.message.includes("did not return a response")) {
         return "I'm sorry, Boss, I couldn't process that. Could you try rephrasing?";
     }
