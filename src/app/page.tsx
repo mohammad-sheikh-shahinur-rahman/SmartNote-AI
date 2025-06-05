@@ -14,6 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getTranslations } from '@/lib/translations';
 import Link from 'next/link';
@@ -83,6 +84,12 @@ export default function HomePage() {
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [isChatAccordionOpen, setIsChatAccordionOpen] = useState(false);
 
+  // Welcome message state
+  const [typedWelcomeMessage, setTypedWelcomeMessage] = useState('');
+  const [isTypingComplete, setIsTypingComplete] = useState(false);
+  const fullWelcomeMessage = t.welcomeMessageTyping;
+
+
   useEffect(() => {
     const storedNotes = localStorage.getItem('smartnote-ai-notes');
     if (storedNotes) {
@@ -110,6 +117,23 @@ export default function HomePage() {
         setChatMessages([{ sender: 'ai', text: t.aiWelcomeMessage }]);
     }
   }, [isChatAccordionOpen, t.aiWelcomeMessage, isLoadingChat, chatMessages.length]);
+
+  useEffect(() => {
+    setTypedWelcomeMessage('');
+    setIsTypingComplete(false);
+    let i = 0;
+    const typingInterval = setInterval(() => {
+      if (i < fullWelcomeMessage.length) {
+        setTypedWelcomeMessage(prev => prev + fullWelcomeMessage.charAt(i));
+        i++;
+      } else {
+        clearInterval(typingInterval);
+        setIsTypingComplete(true);
+      }
+    }, 70); // Typing speed (milliseconds per character)
+
+    return () => clearInterval(typingInterval);
+  }, [fullWelcomeMessage]);
 
 
   const handleSaveNote = (note: Note) => {
@@ -217,7 +241,7 @@ export default function HomePage() {
             className="w-full mb-6 shadow-md rounded-lg bg-card"
             onValueChange={(value) => setIsChatAccordionOpen(value === "ai-chat")}
           >
-            <AccordionItem value="ai-chat" className="border-b-0">
+            <AccordionItem value="ai-chat">
               <AccordionTrigger className="px-6 py-4 text-lg font-semibold text-primary">
                 {t.chatWithAdvisorTitle}
               </AccordionTrigger>
@@ -282,6 +306,20 @@ export default function HomePage() {
               </AccordionContent>
             </AccordionItem>
           </Accordion>
+        </div>
+
+        <div className="mb-8">
+          <Card className="bg-card shadow-lg border border-primary/20 rounded-lg">
+            <CardHeader>
+              <CardTitle className="text-2xl font-headline text-primary">{t.welcomeMessageTitle}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-lg text-foreground min-h-[3em] sm:min-h-[2.5em]"> {/* min-h to prevent layout shift */}
+                {typedWelcomeMessage}
+                {!isTypingComplete && <span className="animate-blink ml-1 font-light">|</span>}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
         <div className="mb-6 flex flex-col sm:flex-row gap-4 justify-between items-center">
@@ -399,5 +437,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

@@ -165,6 +165,10 @@ export const translations = {
     sendButtonLabel: "Send message",
     aiWelcomeMessage: "Hello Boss! I am your AI Advisor, created by Mohammad Sheikh Shahinur Rahman. How can I assist you today?",
     chatError: "Sorry Boss, I'm having trouble connecting right now. Please try again later.",
+
+    // Welcome Message on Home Page
+    welcomeMessageTitle: "Welcome, Boss!",
+    welcomeMessageTyping: "Take a moment to relax. I'm always ready to help you organize your creative ideas! Welcome to SmartNote AI, your intelligent notebook. Let's give your thoughts a new shape."
   },
   bn: {
     appTitle: 'স্মার্টনোট এআই',
@@ -329,6 +333,10 @@ export const translations = {
     sendButtonLabel: "বার্তা পাঠান",
     aiWelcomeMessage: "হ্যালো বস! আমি আপনার এআই উপদেষ্টা, আমাকে তৈরি করেছেন মোহাম্মদ শেখ শাহিনুর রহমান। আজ আমি আপনাকে কীভাবে সহায়তা করতে পারি?",
     chatError: "দুঃখিত বস, এই মুহূর্তে সংযোগ করতে সমস্যা হচ্ছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।",
+
+    // Welcome Message on Home Page
+    welcomeMessageTitle: "স্বাগতম, বস!",
+    welcomeMessageTyping: "কাজের ফাঁকে একটু বিশ্রাম নিন। আপনার সৃজনশীল ধারণাগুলো সাজিয়ে গুছিয়ে রাখতে আমি সর্বদা প্রস্তুত! আপনার স্মার্ট নোটবুক, SmartNote AI-তে আপনাকে স্বাগতম। আসুন, আপনার চিন্তাভাবনাগুলোকে নতুন রূপ দেই।"
   },
 };
 

@@ -289,3 +289,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .animate-blink {
+    animation: blink-opacity 0.75s step-end infinite;
+  }
+}
+
+@keyframes blink-opacity {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
+}
