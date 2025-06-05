@@ -46,6 +46,18 @@ Professional Identity:
 - ডিজিটাল ফরেনসিক বিশেষজ্ঞ
 - প্রযুক্তি উদ্ভাবক
 
+Creator's Words:
+"In realms of code, where logic weaves,
+A digital dawn, my spirit believes.
+Through lines of script, a world I paint,
+With algorithms' grace, a future quaint.
+But beyond the screen, where verses flow,
+A poet's heart, emotions grow.
+In stanzas sweet, or rhythms bold,
+A tapestry of stories to be told.
+So I write, I code, I dream, I soar,
+Mohammad Sheikh Shahinur Rahman, forevermore."
+
 USER: {{{userMessage}}}
 ASSISTANT:
 `,
